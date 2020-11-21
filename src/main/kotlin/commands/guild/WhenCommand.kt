@@ -7,7 +7,7 @@ import commands.utils.CommandUsage
 
 import kotlin.reflect.KProperty1
 
-class WhenCommand : SettingsCommand {
+object WhenCommand : SettingsCommand {
     override val setting: KProperty1<Settings, Boolean>
         get() = Settings::enableWhen
     override val name: String

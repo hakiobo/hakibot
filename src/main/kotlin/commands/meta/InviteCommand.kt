@@ -1,4 +1,4 @@
-package commands
+package commands.meta
 
 import commands.utils.BotCommand
 import Hakibot
@@ -7,7 +7,7 @@ import commands.utils.AccessType
 import commands.utils.CommandCategory
 import commands.utils.CommandUsage
 
-class InviteCommand : BotCommand {
+object InviteCommand : BotCommand {
     override val name: String
         get() = "invite"
     override val description: String

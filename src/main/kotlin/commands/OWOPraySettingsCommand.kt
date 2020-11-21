@@ -6,13 +6,14 @@ import HakiUser
 import OWOSettings
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.Argument
+import commands.utils.CommandCategory
 import commands.utils.CommandUsage
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollection
 import org.litote.kmongo.setValue
 
-class OWOPraySettingsCommand : BotCommand {
+object OWOPraySettingsCommand : BotCommand {
 
     override val name: String
         get() = "owopray"
@@ -35,6 +36,9 @@ class OWOPraySettingsCommand : BotCommand {
                 ), "Sets your owo pray/curse reminder"
             )
         )
+
+    override val category: CommandCategory
+        get() = CommandCategory.REMINDER
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         val user = getUserFromDB(mCE.message.author!!.id)

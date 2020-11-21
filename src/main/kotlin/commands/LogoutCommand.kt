@@ -7,7 +7,7 @@ import com.gitlab.kordlib.core.entity.channel.MessageChannel
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
 
-class LogoutCommand : BotCommand{
+object LogoutCommand : BotCommand{
     override val name: String
         get() = "logout"
     override val description: String

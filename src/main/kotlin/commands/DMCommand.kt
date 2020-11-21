@@ -5,7 +5,7 @@ import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
 import qualityEmojis
 
-class DMCommand : BotCommand {
+object DMCommand : BotCommand {
 
     override val name: String
         get() = "dm"

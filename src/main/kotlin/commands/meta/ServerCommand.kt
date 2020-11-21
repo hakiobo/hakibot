@@ -1,11 +1,12 @@
-package commands
+package commands.meta
 
 import Hakibot
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
+import commands.utils.CommandCategory
 import commands.utils.CommandUsage
 
-class ServerCommand : BotCommand {
+object ServerCommand : BotCommand {
     override val name: String
         get() = "server"
     override val aliases: List<String>
@@ -14,8 +15,8 @@ class ServerCommand : BotCommand {
         get() = "Links an invite to Hakibot's server"
     override val usages: List<CommandUsage>
         get() = listOf(CommandUsage(emptyList(), "Displays the Invite to Hakibot Server"))
-//    override val category: CommandCategory
-//        get() = CommandCategory.HIDDEN
+    override val category: CommandCategory
+        get() = CommandCategory.HAKIBOT
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
 //        if (mCE.message.author == getHaki()) {

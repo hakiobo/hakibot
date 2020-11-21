@@ -9,7 +9,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.getCollection
 import org.litote.kmongo.setValue
 
-class PrefixCommand : BotCommand {
+object PrefixCommand : BotCommand {
 
     override val name: String
         get() = "prefix"

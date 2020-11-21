@@ -7,7 +7,7 @@ import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.Argument
 import commands.utils.CommandUsage
 
-class WhoIsCommand : BotCommand {
+object WhoIsCommand : BotCommand {
 
     override val name: String
         get() = "whois"

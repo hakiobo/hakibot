@@ -11,7 +11,7 @@ import commands.utils.CommandUsage
 import kotlin.reflect.KProperty1
 
 
-class TriggerCommand : SettingsCommand {
+object TriggerCommand : SettingsCommand {
     override val setting: KProperty1<Settings, Boolean>
         get() = Settings::enableTriggers
     override val name: String

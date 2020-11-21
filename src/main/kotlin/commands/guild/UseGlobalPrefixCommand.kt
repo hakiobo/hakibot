@@ -8,7 +8,7 @@ import commands.utils.CommandUsage
 
 import kotlin.reflect.KProperty1
 
-class UseGlobalPrefixCommand : SettingsCommand {
+object UseGlobalPrefixCommand : SettingsCommand {
     override val setting: KProperty1<Settings, Boolean>
         get() = Settings::allowGlobalPrefix
     override val name: String

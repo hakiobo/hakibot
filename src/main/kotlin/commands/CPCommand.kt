@@ -12,7 +12,7 @@ import org.bson.conversions.Bson
 import org.litote.kmongo.*
 import java.awt.Color
 
-class CPCommand : BotCommand {
+object CPCommand : BotCommand {
 
     override val name: String
         get() = "cp"

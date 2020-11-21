@@ -56,15 +56,15 @@ data class CustomPatreon(
     }
 
 
-    fun toEmbed(embed: EmbedBuilder = EmbedBuilder()): EmbedBuilder {
-        embed.color = Color(random.nextInt(0x1000000))
-        embed.title = name
+    fun toEmbed(embed: EmbedBuilder = EmbedBuilder()): EmbedBuilder = embed.apply {
+        color = Color(random.nextInt(0x1000000))
+        title = name
         if (imageLink != null) {
-            embed.thumbnail {
+            thumbnail {
                 url = imageLink
             }
         }
-        embed.field {
+        field {
 
             name = "Aliases"
             value = if (aliases.isEmpty()) {
@@ -74,17 +74,16 @@ data class CustomPatreon(
             }
         }
         if (creationInfo != null) {
-            embed.footer {
+            footer {
                 text = "Created $creationInfo"
             }
         }
 
-        embed.field {
+        field {
             name = "Stats"
             value =
                 "<:hp:760022501844582421> `$hp` <:att:760022512288661524> `$str` <:pr:760022522631946241> `$pr`\n<:wp:760022531984982088> `$wp` <:mag:760022544614686720> `$mag` <:mr:760022572451495936> `$mr`"
         }
-        return embed
     }
 
     override fun equals(other: Any?): Boolean {

@@ -15,7 +15,7 @@ import org.litote.kmongo.*
 
 import kotlin.Exception
 
-class SearchForCPCommand : BotCommand {
+object SearchForCPCommand : BotCommand {
     override val name: String
         get() = "cpsearch"
     override val description: String
