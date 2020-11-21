@@ -1,6 +1,7 @@
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import org.bson.codecs.pojo.annotations.BsonId
 import java.awt.Color
+import kotlin.random.Random
 
 data class CustomPatreon(
     @BsonId val name: String,
@@ -10,7 +11,7 @@ data class CustomPatreon(
     val wp: Int,
     val mag: Int,
     val mr: Int,
-    val aliases: List<String>? = null,
+    val aliases: List<String> = emptyList(),
     val creationInfo: CreationInfo? = null,
     val lastUpdatedMS: Long = 0,
     val imageLink: String? = null
@@ -40,42 +41,36 @@ data class CustomPatreon(
     override fun toString(): String {
         val sb =
             StringBuilder("Name: $name\n    Stats:\n        hp: $hp str: $str pr: $pr\n        wp: $wp mag: $mag mr: $mr")
-        if (aliases != null) {
-            sb.append("\n    Aliases: ${if (aliases.isEmpty()) "None" else aliases.joinToString(", ")}")
-        }
+        sb.append("\n    Aliases: ${if (aliases.isEmpty()) "None" else aliases.joinToString(", ")}")
         if (creationInfo != null) {
             sb.append("\n    Created: $creationInfo")
         }
-        if (imageLink != null){
+        if (imageLink != null) {
             sb.append("\n    With Image")
         }
         return sb.toString()
     }
 
-    fun simpleString(): String{
+    fun simpleString(): String {
         return "$name\n$hp $str $pr $wp $mag $mr"
     }
 
 
-
-
     fun toEmbed(embed: EmbedBuilder = EmbedBuilder()): EmbedBuilder {
-        embed.color = Color(0xABCDEF)
+        embed.color = Color(random.nextInt(0x1000000))
         embed.title = name
         if (imageLink != null) {
             embed.thumbnail {
                 url = imageLink
             }
         }
-        if (aliases != null) {
-            embed.field {
+        embed.field {
 
-                name = "Aliases"
-                value = if (aliases.isEmpty()) {
-                    "*None*"
-                } else {
-                    aliases.joinToString(", ")
-                }
+            name = "Aliases"
+            value = if (aliases.isEmpty()) {
+                "*None*"
+            } else {
+                aliases.joinToString(", ")
             }
         }
         if (creationInfo != null) {
@@ -121,6 +116,10 @@ data class CustomPatreon(
         result = 31 * result + mag
         result = 31 * result + mr
         return result
+    }
+
+    companion object {
+        val random = Random.Default
     }
 }
 

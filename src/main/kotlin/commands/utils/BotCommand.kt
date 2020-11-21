@@ -44,7 +44,7 @@ enum class ChoiceType(val argType: ArgumentType) {
 }
 
 enum class ArgumentType(val prefix: String, val suffix: String) {
-    EXACT("", ""), PARAMETER("<", ">"), TEXT("{", "}"), CHOICE("[", "]");
+    EXACT("", ""), PARAMETER("<", ">"), TEXT("{", "}"), CHOICE("[", "]"), VARARG("<", ">...");
 }
 
 enum class CommandCategory(val category: String) {

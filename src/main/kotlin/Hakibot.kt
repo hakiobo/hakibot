@@ -42,7 +42,6 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         "yez" to "doesn't code enough",
         "furo" to "Furory?",
         "shufi" to "your bow lol god down",
-        "nora" to ":purple_heart:", "flo" to ":purple_heart:",
         "sellchart" to "5 - B\n2.5 - F\n2 - P CP H\n1.67 - M\n1.5 - L G D\n1.2 - S\n1 - C E\n0.6 - U\n0.5 - R",
         "licu" to "Should curse haki"
     )

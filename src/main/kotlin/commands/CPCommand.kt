@@ -104,29 +104,6 @@ class CPCommand : BotCommand {
                         mCE.message.channel.createEmbed {
                             cp.toEmbed(this)
                         }
-//                        mCE.message.channel.createEmbed {
-//                            color = Color(0xABCDEF)
-//                            title = cp.name
-//                            if (cp.aliases != null) {
-//                                field {
-//                                    name = "Aliases"
-//                                    value = if (cp.aliases.isEmpty()) {
-//                                        "**None**"
-//                                    } else {
-//                                        cp.aliases.joinToString(", ")
-//                                    }
-//                                }
-//                            }
-//                            if(cp.creationInfo != null){
-//                                footer {
-//                                    text = "Created ${cp.creationInfo}"
-//                                }
-//                            }
-//                            field {
-//                                name = "Stats"
-//                                value = "hp: ${cp.hp} str: ${cp.str} pr: ${cp.pr}\n        wp: ${cp.wp} mag: ${cp.mag} mr: ${cp.mr}"
-//                            }
-//                        }
                     }
                 } else if (args.size > 2) {
                     val cps = getCPs(args, cpCol)
@@ -134,7 +111,24 @@ class CPCommand : BotCommand {
                         it?.simpleString() ?: "CP Not Found"
                     })
                 } else {
-                    mCE.message.channel.createMessage("Incorrect format for dexing cp expecting `h!cp $cmd <cp name>`")
+                    mCE.message.channel.createMessage("Invalid syntax! expecting `h!cp $cmd <cp names>`")
+                }
+            }
+
+            "ga", "getall", "da", "reg" -> {
+                if (args.size == 2) {
+                    val cps = getCPsRegex(args[1].filter(Char::isLetterOrDigit).toLowerCase(), cpCol)
+                    val msg = "Found Cps\n${
+                        cps.map(CustomPatreon::name).sorted().take(20).ifEmpty { listOf("No Matches") }
+                            .joinToString("\n")
+                    }${if (cps.size > 20) "\n(${cps.size - 20} more)" else ""}"
+
+                    sendMessage(
+                        mCE.message.channel,
+                        if (msg.length <= 2000) msg else "Result Message too long (>2000 characters)"
+                    )
+                } else {
+                    sendMessage(mCE.message.channel, "Invalid syntax! expecting `h!cp $cmd <partial cp name>`", 5_000)
                 }
             }
 
@@ -222,22 +216,6 @@ class CPCommand : BotCommand {
                     sendMessage(mCE.message.channel, "Correct format is `h!cp $cmd <month> <year>`", 5_000)
                 }
             }
-//                "alias", "aa", "al", "addalias" -> {
-//                    if(args.size == 3){
-//                        val alias = args[1]
-//                        val name = args[2]
-//                        if(cpCol.findOne(CustomPatreon::name eq name) == null){
-//                            mCE.message.channel.createMessage("Could not find cp $name")
-//                        } else if(cpCol.findOne(CustomPatreon::name eq alias) != null){
-//                            mCE.message.channel.createMessage("$alias is already a cp in the database")
-//                        } else {
-//                            val aliasCol = db.getCollection<CPAlias>("cpalias")
-//
-//                        }
-//                    } else {
-//                        mCE.message.channel.createMessage("wrong format for adding c[ alias, expecting `h!cp $cmd <alias> <actual name>`")
-//                    }
-//                }
             else -> {
                 if (args.size == 1) {
                     val cp = getCP(cmd, cpCol)
@@ -256,6 +234,13 @@ class CPCommand : BotCommand {
                 }
             }
         }
+    }
+
+    private fun Hakibot.getCPsRegex(
+        name: String,
+        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+    ): List<CustomPatreon> {
+        return cpCol.find(or(CustomPatreon::name regex name, CustomPatreon::aliases regex name)).toList()
     }
 
     private fun Hakibot.getCPs(
