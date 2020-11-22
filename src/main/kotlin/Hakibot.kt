@@ -1,3 +1,4 @@
+import UserGuildOwOCount.Companion.countOwO
 import com.gitlab.kordlib.common.entity.DiscordMessage
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.Kord
@@ -86,7 +87,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                         message.addReaction(it)
                     }
                 }
-            } else if(userId.longValue == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId){
+            } else if (userId.longValue == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId) {
                 message.delete()
             }
         }
@@ -209,9 +210,13 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
         val owoPre = guild.owoPrefix
         if (mCE.message.content.startsWith(GLOBAL_OWO_PREFIX, ignoreCase = true)) {
-            handleOWOCommand(mCE, mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim())
+            handleOWOCommand(mCE, guild, mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim())
         } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
-            handleOWOCommand(mCE, mCE.message.content.drop(owoPre.length).trim())
+            handleOWOCommand(mCE, guild, mCE.message.content.drop(owoPre.length).trim())
+        } else {
+            if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu")) {
+                countOwO(mCE, getUserFromDB(mCE.message.author!!.id), guild)
+            }
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
             if (!guild.settings.allowGlobalPrefix) {
@@ -257,11 +262,14 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         return null
     }
 
-    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, msg: String) {
+    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String) {
         val split = msg.split(Pattern.compile("\\s"))
-        when (split.first()) {
+        when (split.firstOrNull()) {
             "hunt", "h" -> owoHuntOWOCMD(mCE)
             "pray", "curse" -> owoPrayOWOCMD(mCE, split.first())
+            in owoCommands -> {
+            }
+            else -> countOwO(mCE, getUserFromDB(mCE.message.author!!.id), guild)
         }
     }
 
@@ -294,7 +302,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                     HakiUser::_id eq authorID.value,
                     setValue(HakiUser::owoSettings / OWOSettings::prayCD, true)
             )
-            if(cmd.startsWith("p")){
+            if (cmd.startsWith("p")) {
                 mCE.message.addReaction(PRAY_EMOJI)
             } else {
                 mCE.message.addReaction(CURSE_EMOJI)
@@ -472,3 +480,5 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
     }
 }
+
+fun Snowflake.toInstant(): Instant = Instant.ofEpochMilli((longValue shr 22) + 1420070400000)
