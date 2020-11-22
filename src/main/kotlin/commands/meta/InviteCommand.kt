@@ -18,12 +18,10 @@ object InviteCommand : BotCommand {
         get() = CommandCategory.HIDDEN
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-
         if (mCE.message.author?.id?.longValue == Hakibot.HAKIOBO_ID) {
             sendMessage(mCE.message.channel, "https://discord.com/api/oauth2/authorize?client_id=750534176666550384&permissions=346176&scope=bot", 60_000)
         } else {
             sendMessage(mCE.message.channel, "Hakibot is in the max number of servers for an unverified bot (100)\nAn announcement will be made once Hakibot is verified")
         }
     }
-
 }

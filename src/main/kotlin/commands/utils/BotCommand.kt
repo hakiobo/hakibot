@@ -44,6 +44,8 @@ enum class ChoiceType(val argType: ArgumentType) {
 }
 
 enum class ArgumentType(val prefix: String, val suffix: String) {
+    FLAG("-", ""),
+    FLAG_PARAM("-<",">"),
     EXACT("", ""),
     PARAMETER("<", ">"),
     TEXT("{", "}"),

@@ -1,3 +1,4 @@
+import com.gitlab.kordlib.common.entity.DiscordMessage
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.Kord
 import com.gitlab.kordlib.core.behavior.MessageBehavior
@@ -78,13 +79,15 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             messageChannelById(ONLINE_CHANNEL, "Online!")
         }
         client.on<ReactionAddEvent> {
-            if (user.id.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && !isResetTime()) {
+            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && !isResetTime()) {
                 val embed = getMessage().embeds.firstOrNull()
                 if (embed?.author?.name == "Today's Available Weapons") {
                     readShopWeapon(embed.description!!).forEach {
                         message.addReaction(it)
                     }
                 }
+            } else if(userId.longValue == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId){
+                message.delete()
             }
         }
         client.on<MessageCreateEvent> {
@@ -375,8 +378,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    internal suspend fun messageChannelById(channelId: Long, message: String, embed: EmbedBuilder? = null) {
-        client.rest.channel.createMessage(channelId.toString()) {
+    internal suspend fun messageChannelById(channelId: Long, message: String, embed: EmbedBuilder? = null): DiscordMessage {
+        return client.rest.channel.createMessage(channelId.toString()) {
             content = message
             this.embed = embed
         }
