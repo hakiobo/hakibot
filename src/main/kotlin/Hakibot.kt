@@ -261,7 +261,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.first()) {
             "hunt", "h" -> owoHuntOWOCMD(mCE)
-            "pray", "curse" -> owoPrayOWOCMD(mCE)
+            "pray", "curse" -> owoPrayOWOCMD(mCE, split.first())
         }
     }
 
@@ -285,7 +285,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    private suspend fun owoPrayOWOCMD(mCE: MessageCreateEvent) {
+    private suspend fun owoPrayOWOCMD(mCE: MessageCreateEvent, cmd: String) {
         val authorID = mCE.message.author!!.id
         val col = db.getCollection<HakiUser>("users")
         val user = getUserFromDB(authorID)
@@ -294,7 +294,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                     HakiUser::_id eq authorID.value,
                     setValue(HakiUser::owoSettings / OWOSettings::prayCD, true)
             )
-            mCE.message.addReaction(ReactionEmoji.Unicode("\ud83c\udded"))
+            if(cmd.startsWith("p")){
+                mCE.message.addReaction(PRAY_EMOJI)
+            } else {
+                mCE.message.addReaction(CURSE_EMOJI)
+            }
 
             client.launch {
                 delay(300_000)
@@ -443,6 +447,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     companion object {
         const val BOT_NAME = "HakiBot"
         const val HAKIBOT_SERVER = 758479736564875265
+        const val LXV_SERVER = 714152739252338749
         const val ONLINE_CHANNEL = 761020851029803078
         const val CP_ADD_CHANNEL = 766050133430239243
         const val CP_UPD_CHANNEL = 766050160949330001
@@ -453,6 +458,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val OWO_ID = 408785106942164992
         const val GLOBAL_PREFIX = "h!"
         const val GLOBAL_OWO_PREFIX = "owo"
+        val PRAY_EMOJI = ReactionEmoji.Unicode("\ud83d\ude4f")
+        val CURSE_EMOJI = ReactionEmoji.Unicode("\ud83d\udc7b")
 
         fun isResetTime(): Boolean {
 
