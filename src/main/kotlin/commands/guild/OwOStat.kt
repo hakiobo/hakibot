@@ -56,11 +56,21 @@ object OwOStat : BotCommand {
             query.normalize(mCE)
             mCE.message.channel.createEmbed {
                 title = "${client.getUser(Snowflake(userId))?.username}'s OwOs in ${mCE.getGuild()!!.name}"
-                description = "**Today**: ${query.dailyCount}\n" +
-                        "**This Week**: ${query.weeklyCount}\n" +
-                        "**This Month**: ${query.monthlyCount}\n" +
-                        "**This Year**: ${query.yearlyCount}\n" +
-                        "__**Total**__: ${query.owoCount}\n"
+                description = "__**Total**__: ${query.owoCount}\n"
+                field {
+                    name = "Current Stats"
+                    value = "__Today__: ${query.dailyCount}\n" +
+                            "__This Week__: ${query.weeklyCount}\n" +
+                            "__This Month__: ${query.monthlyCount}\n" +
+                            "__This Year__: ${query.yearlyCount}"
+                }
+                field {
+                    name = "Past Stats"
+                    value = "__Yesterday__: ${query.yesterdayCount}\n" +
+                            "__Last Week__: ${query.lastWeekCount}\n" +
+                            "__Last Month__: ${query.lastMonthCount}\n" +
+                            "__Last Year__: ${query.lastYearCount}"
+                }
                 color = Color(0xABCDEF)
             }
         }

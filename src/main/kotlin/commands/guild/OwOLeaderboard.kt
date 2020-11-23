@@ -27,7 +27,8 @@ object OwOLeaderboard : BotCommand {
             var typeSet = false
             var sizeSet = false
             var valid = true
-            for (arg in args) {
+            for (a in args) {
+                val arg = a.toLowerCase()
                 if (arg.toIntOrNull() != null) {
                     if (sizeSet) {
                         valid = false
@@ -57,12 +58,12 @@ object OwOLeaderboard : BotCommand {
                         limit(size)
                 ).toList()
                 mCE.message.channel.createEmbed {
-                    title = "${type.desc} OwO Leaderboard for ${mCE.getGuild()?.name ?: "No Name????"}"
+                    title = "${type.desc}OwO Leaderboard for ${mCE.getGuild()?.name ?: "No Name????"}"
                     for (x in result.indices) {
                         val res = result[x]
                         field {
                             name = "#${x + 1}: ${client.getUser(Snowflake(res.user))?.username ?: "Deleted User#${res.user}"}"
-                            value =  "${type.stat.get(res)} OwOs"
+                            value = "${type.stat.get(res)} OwOs"
                         }
                     }
                 }
@@ -77,10 +78,14 @@ object OwOLeaderboard : BotCommand {
 
     enum class RankingType(val stat: KProperty1<UserGuildOwOCount, Int>, val triggers: List<String>, val desc: String) {
         TOTAL(UserGuildOwOCount::owoCount, listOf("all", "total"), ""),
-        YEAR(UserGuildOwOCount::yearlyCount, listOf("year", "y", "yearly"), "Yearly"),
-        MONTH(UserGuildOwOCount::monthlyCount, listOf("month", "m", "monthly"), "Monthly"),
-        WEEK(UserGuildOwOCount::weeklyCount, listOf("week", "w", "weekly"), "Weekly"),
+        YEAR(UserGuildOwOCount::yearlyCount, listOf("year", "y", "yearly"), "Yearly "),
+        LAST_YEAR(UserGuildOwOCount::lastYearCount, listOf("lastyear", "prevyear", "ly", "py"), "Last Year's "),
+        MONTH(UserGuildOwOCount::monthlyCount, listOf("month", "m", "monthly"), "Monthly "),
+        LAST_MONTH(UserGuildOwOCount::lastMonthCount, listOf("lastmonth", "prevmonth", "lm", "pm"), "Last Month's "),
+        WEEK(UserGuildOwOCount::weeklyCount, listOf("week", "w", "weekly"), "Weekly "),
+        LAST_WEEK(UserGuildOwOCount::lastWeekCount, listOf("lastweek", "prevweek", "lw", "pw"), "Last Month's "),
         DAY(UserGuildOwOCount::dailyCount, listOf("today", "d", "day", "daily"), "Today's "),
+        YESTERDAY(UserGuildOwOCount::yesterdayCount, listOf("yesterday", "yes", "yday"), "Yesterday's "),
     }
 }
 
