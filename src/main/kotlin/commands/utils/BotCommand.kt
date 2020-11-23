@@ -56,7 +56,7 @@ enum class ArgumentType(val prefix: String, val suffix: String) {
 enum class CommandCategory(val category: String) {
     HIDDEN("Hidden"),
     REMINDER("Reminders"),
-    GUILD("Guild Settings"),
+    GUILD("Guild"),
     HAKIBOT("Bot Related"),
     MISC("Miscellaneous"),
 }

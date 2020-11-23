@@ -63,7 +63,9 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             LogoutCommand,
             TriggerCommand,
             WhenCommand,
-            UseGlobalPrefixCommand
+            UseGlobalPrefixCommand,
+            OwOStat,
+            OwOLeaderboard,
     )
 
     suspend fun startUp() {
@@ -394,6 +396,20 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         return client.rest.channel.createMessage(channelId.toString()) {
             content = message
             this.embed = embed
+        }
+    }
+
+    fun getUserIdFromString(s: String): Long? {
+        return if (s.toLongOrNull() != null) {
+            s.toLong()
+        } else if (s.startsWith("<@") && s.endsWith(">")) {
+            if (s[2] == '!') {
+                s.drop(3).dropLast(1).toLongOrNull()
+            } else {
+                s.drop(2).dropLast(1).toLongOrNull()
+            }
+        } else {
+            null
         }
     }
 

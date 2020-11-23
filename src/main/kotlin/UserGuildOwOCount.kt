@@ -1,10 +1,9 @@
-import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.UpdateOptions
 import org.litote.kmongo.*
 import java.time.Duration
 import java.time.Instant
+import java.time.Year
 import java.time.ZoneId
 
 data class UserGuildOwOCount(
@@ -13,27 +12,112 @@ data class UserGuildOwOCount(
         val guild: Long,
         var owoCount: Int = 0,
         var dailyCount: Int = 0,
+        var yesterdayCount: Int = 0,
         var weeklyCount: Int = 0,
+        var lastWeekCount: Int = 0,
         var monthlyCount: Int = 0,
+        var lastMonthCount: Int = 0,
         var yearlyCount: Int = 0,
+        var lastYearCount: Int = 0,
         var lastOWO: Long = 0,
 ) {
+
+    fun normalize(mCE: MessageCreateEvent) {
+        val curTime = mCE.message.id.toInstant().atZone(ZoneId.of("PST", ZoneId.SHORT_IDS)).toLocalDate()
+        val oldTime = Instant.ofEpochMilli(lastOWO).atZone(ZoneId.of("PST", ZoneId.SHORT_IDS)).toLocalDate()
+
+        when (curTime.year - oldTime.year) {
+            0 -> {
+                when(curTime.monthValue - oldTime.monthValue){
+                    1 -> {
+                        lastMonthCount = monthlyCount
+                        monthlyCount = 0
+                    }
+                    2 -> {
+                        lastMonthCount = 0
+                        monthlyCount = 0
+                    }
+                }
+                when(curTime.dayOfYear - oldTime.dayOfYear){
+                    1 -> {
+                        yesterdayCount = dailyCount
+                        dailyCount = 0
+                    }
+                    2 -> {
+                        yesterdayCount = 0
+                        dailyCount = 0
+                    }
+                }
+
+                //weekly stuff
+                val difDoW = curTime.dayOfWeek.value % 7 - oldTime.dayOfWeek.value % 7
+                val dif = curTime.dayOfYear - oldTime.dayOfYear
+                if (dif == difDoW + 7) {
+                    lastWeekCount = weeklyCount
+                    weeklyCount = 0
+                } else if (dif != difDoW) {
+                    lastWeekCount = 0
+                    weeklyCount = 0
+                }
+            }
+            1 -> {
+                lastYearCount = yearlyCount
+                lastMonthCount = if (curTime.monthValue == 1 && oldTime.monthValue == 12) {
+                    yesterdayCount = if (curTime.dayOfMonth == 1 && oldTime.dayOfMonth == 31) {
+                        dailyCount
+                    } else {
+                        0
+                    }
+                    monthlyCount
+                } else {
+                    yesterdayCount = 0
+                    0
+                }
+                yearlyCount = 0
+                monthlyCount = 0
+                dailyCount = 0
+
+                //weekly stuff
+                val day2 = curTime.dayOfYear + 365 + if (Year.isLeap(oldTime.year.toLong())) 1 else 0
+                val difDoW = curTime.dayOfWeek.value % 7 - oldTime.dayOfWeek.value % 7
+                val dif = day2 - oldTime.dayOfYear
+                if (dif == difDoW + 7) {
+                    lastWeekCount = weeklyCount
+                    weeklyCount = 0
+                } else if (dif != difDoW) {
+                    lastWeekCount = 0
+                    weeklyCount = 0
+                }
+
+            }
+            else -> {
+                dailyCount = 0
+                yesterdayCount = 0
+                weeklyCount = 0
+                lastWeekCount = 0
+                monthlyCount = 0
+                lastMonthCount = 0
+                yearlyCount = 0
+                lastYearCount = 0
+            }
+        }
+    }
 
     companion object {
         private const val OWO_CD = 10;
 
+
         fun Hakibot.countOwO(mCE: MessageCreateEvent, user: HakiUser, guild: HakiGuild) {
-            if (guild._id != Hakibot.LXV_SERVER.toString()) return
             val newInstant = mCE.message.id.toInstant()
-            if (Duration.between(Snowflake(user.owoCount.lastOwO).toInstant(), newInstant).seconds < OWO_CD) return
+            if (Duration.between(Instant.ofEpochMilli(user.owoCount.lastOwO), newInstant).seconds < OWO_CD) return
             val col = db.getCollection<UserGuildOwOCount>("owo-count")
             val id = "${user._id}|${guild._id}"
             val entry = col.findOne(UserGuildOwOCount::_id eq id)
                     ?: UserGuildOwOCount(id, user._id.toLong(), guild._id.toLong())
-            val newTime = newInstant.atZone(ZoneId.of("PST", ZoneId.SHORT_IDS))!!
-            val oldTime = Instant.ofEpochMilli(entry.lastOWO).atZone(ZoneId.of("PST", ZoneId.SHORT_IDS))!!
-            val newTimeMS = newTime.toInstant().toEpochMilli()
+            val newTimeMS = newInstant.toEpochMilli()
             db.getCollection<HakiUser>("users").updateOne(HakiUser::_id eq user._id, setValue(HakiUser::owoCount, UserOWOCount(user.owoCount.count + 1, newTimeMS)))
+
+            entry.normalize(mCE)
 
             entry.lastOWO = newTimeMS
             entry.owoCount++
@@ -41,23 +125,6 @@ data class UserGuildOwOCount(
             entry.monthlyCount++
             entry.weeklyCount++
             entry.dailyCount++
-
-
-            if (newTime.year != oldTime.year) {
-                entry.dailyCount = 1
-                entry.weeklyCount = 1
-                entry.monthlyCount = 1
-                entry.yearlyCount = 1
-            } else if (newTime.month != oldTime.month) {
-                entry.dailyCount = 1
-                entry.weeklyCount = 1
-                entry.monthlyCount = 1
-            } else if (newTime.dayOfWeek.value - oldTime.dayOfWeek.value != newTime.dayOfMonth - oldTime.dayOfMonth) {
-                entry.dailyCount = 1
-                entry.weeklyCount = 1
-            } else if (newTime.dayOfMonth != oldTime.dayOfMonth) {
-                entry.dailyCount = 1
-            }
             col.updateOne(UserGuildOwOCount::_id eq entry._id, entry, UpdateOptions().upsert(true))
         }
     }
