@@ -26,6 +26,7 @@ import entities.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
+import pl.kremblewski.expressionevaluator.evaluate
 import java.lang.Exception
 import java.time.Instant
 import java.time.ZoneId
@@ -67,6 +68,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             UseGlobalPrefixCommand,
             OwOStat,
             OwOLeaderboard,
+            MathCommand,
     )
 
     suspend fun startUp() {
@@ -156,7 +158,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    suspend fun handleMessage(mCE: MessageCreateEvent) {
+    private suspend fun handleMessage(mCE: MessageCreateEvent) {
         if (mCE.message.author?.id == client.selfId) return
         if (mCE.message.author == null) return
         if (mCE.message.author?.id?.longValue == OWO_ID) {
@@ -255,9 +257,6 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     private suspend fun handleCommand(mCE: MessageCreateEvent, msg: String) {
         val split = msg.split(Pattern.compile("\\s+"))
         val userCMD = split.first().toLowerCase()
-//        if (userCMD == "channel") {
-//            println((client.getChannel(Snowflake(728474015181570070)) as GuildMessageChannel).getGuild().name)
-//        }
         val args = split.drop(1)
         if (userCMD == "") return
         val cmd = lookupCMD(userCMD)
