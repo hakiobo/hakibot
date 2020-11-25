@@ -83,7 +83,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             messageChannelById(ONLINE_CHANNEL, "Online!")
         }
         client.on<ReactionAddEvent> {
-            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && !isResetTime()) {
+            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (!isResetTime() || guildId?.longValue == HAKIBOT_SERVER)) {
                 val embed = getMessage().embeds.firstOrNull()
                 if (embed?.author?.name == "Today's Available Weapons") {
                     readShopWeapon(embed.description!!).forEach {
@@ -100,7 +100,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             }
         }
         client.on<MessageUpdateEvent> {
-            if (new.author?.id == OWO_ID.toString() && !isResetTime()) {
+            if (new.author?.id == OWO_ID.toString() && (!isResetTime() || this.new.guildId?.toLong() == HAKIBOT_SERVER)) {
                 if (new.embeds?.firstOrNull()?.author?.name == "Today's Available Weapons") {
                     try {
 
