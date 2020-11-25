@@ -20,7 +20,7 @@ object ServerCommand : BotCommand {
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
 //        if (mCE.message.author == getHaki()) {
-        sendMessage(mCE.message.channel, "https://discord.gg/k3XgR4s", 60_000)
+        sendMessage(mCE.message.channel, "https://discord.gg/k3XgR4s")
 //        } else {
 //            sendAndDelete(mCE.message.channel, "Hakibot server not ready to be public yet", 5_000)
 //        }

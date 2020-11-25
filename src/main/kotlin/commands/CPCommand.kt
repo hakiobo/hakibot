@@ -25,41 +25,41 @@ object CPCommand : BotCommand {
 
     override val usages: List<CommandUsage>
         get() = listOf(
-            CommandUsage(listOf(), "Shows the total number of pets stored"),
-            CommandUsage(
-                listOf(
-                    Argument(listOf("dex", "d", "get", "g")),
-                    Argument(listOf("CP Name", "Alias"), ChoiceType.DESCRIPTION)
+                CommandUsage(listOf(), "Shows the total number of pets stored"),
+                CommandUsage(
+                        listOf(
+                                Argument(listOf("dex", "d", "get", "g")),
+                                Argument(listOf("CP Name", "Alias"), ChoiceType.DESCRIPTION)
+                        ),
+                        "Gets the stats of a specific CP"
                 ),
-                "Gets the stats of a specific CP"
-            ),
-            CommandUsage(
-                listOf(Argument(listOf("CP Name", "Alias"), ChoiceType.DESCRIPTION)),
-                "Gets the stats of a specific CP"
-            ),
-            CommandUsage(
-                listOf(
-                    Argument(listOf("query", "q", "search", "s")),
-                    Argument("hp"),
-                    Argument("att"),
-                    Argument("pr"),
-                    Argument("wp"),
-                    Argument("mag"),
-                    Argument("mr")
+                CommandUsage(
+                        listOf(Argument(listOf("CP Name", "Alias"), ChoiceType.DESCRIPTION)),
+                        "Gets the stats of a specific CP"
                 ),
-                "Queries for cps that match the given stats. * means any stat"
-            ),
-            CommandUsage(
-                listOf(Argument(listOf("year", "qyear", "qy")), Argument("year")),
-                "Gets a Count of cps made in the given year"
-            ),
-            CommandUsage(
-                listOf(
-                    Argument(listOf("date", "qdate")),
-                    Argument(listOf("month name", "month number"), ChoiceType.DESCRIPTION),
-                    Argument("year")
-                ), "Gets a list of all cps made in a specific month"
-            )
+                CommandUsage(
+                        listOf(
+                                Argument(listOf("query", "q", "search", "s")),
+                                Argument("hp"),
+                                Argument("att"),
+                                Argument("pr"),
+                                Argument("wp"),
+                                Argument("mag"),
+                                Argument("mr")
+                        ),
+                        "Queries for cps that match the given stats. * means any stat"
+                ),
+                CommandUsage(
+                        listOf(Argument(listOf("year", "qyear", "qy")), Argument("year")),
+                        "Gets a Count of cps made in the given year"
+                ),
+                CommandUsage(
+                        listOf(
+                                Argument(listOf("date", "qdate")),
+                                Argument(listOf("month name", "month number"), ChoiceType.DESCRIPTION),
+                                Argument("year")
+                        ), "Gets a list of all cps made in a specific month"
+                )
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
@@ -117,15 +117,15 @@ object CPCommand : BotCommand {
 
             "ga", "getall", "da", "reg" -> {
                 if (args.size == 2) {
-                    val cps = getCPsRegex(args[1].filter(Char::isLetterOrDigit).toLowerCase(), cpCol)
+                    val cps = getCPsRegex(args[1].filter { it.isLetterOrDigit() || it == '_' }.toLowerCase(), cpCol)
                     val msg = "Found Cps\n${
                         cps.map(CustomPatreon::name).sorted().take(20).ifEmpty { listOf("No Matches") }
-                            .joinToString("\n")
+                                .joinToString("\n")
                     }${if (cps.size > 20) "\n(${cps.size - 20} more)" else ""}"
 
                     sendMessage(
-                        mCE.message.channel,
-                        if (msg.length <= 2000) msg else "Result Message too long (>2000 characters)"
+                            mCE.message.channel,
+                            if (msg.length <= 2000) msg else "Result Message too long (>2000 characters)"
                     )
                 } else {
                     sendMessage(mCE.message.channel, "Invalid syntax! expecting `h!cp $cmd <partial cp name>`", 5_000)
@@ -152,12 +152,12 @@ object CPCommand : BotCommand {
                 val filters = mutableListOf<Bson>()
                 if (args.size == 7) {
                     val props = arrayOf(
-                        CustomPatreon::hp,
-                        CustomPatreon::str,
-                        CustomPatreon::pr,
-                        CustomPatreon::wp,
-                        CustomPatreon::mag,
-                        CustomPatreon::mr
+                            CustomPatreon::hp,
+                            CustomPatreon::str,
+                            CustomPatreon::pr,
+                            CustomPatreon::wp,
+                            CustomPatreon::mag,
+                            CustomPatreon::mr
                     )
                     for (x in 0 until 6) {
                         if (args[x + 1] == "*") continue
@@ -192,7 +192,7 @@ object CPCommand : BotCommand {
                 if (args.size == 2) {
                     val year = args.last().toIntOrNull()
                     mCE.message.channel.createMessage(
-                        cpCol.find(CustomPatreon::creationInfo / CreationInfo::year eq year).count().toString()
+                            cpCol.find(CustomPatreon::creationInfo / CreationInfo::year eq year).count().toString()
                     )
                 } else {
                     sendMessage(mCE.message.channel, "Correct format is `h!cp $cmd <year>`", 5_000)
@@ -204,13 +204,13 @@ object CPCommand : BotCommand {
                     val year = args[2].toIntOrNull()
                     val month = args[1].toIntOrNull() ?: CreationInfo.getMonthNum(args[1])
                     val cInfo = if (year == null || month == null) null else CreationInfo(
-                        month,
-                        if (year < 100) 2000 + year else year
+                            month,
+                            if (year < 100) 2000 + year else year
                     )
                     val search = cpCol.find(CustomPatreon::creationInfo eq cInfo).sort(ascending(CustomPatreon::name))
-                        .map { it.name }
+                            .map { it.name }
                     mCE.message.channel.createMessage(
-                        "${search.joinToString("\n")}\n${search.count()}"
+                            "${search.joinToString("\n")}\n${search.count()}"
                     )
                 } else {
                     sendMessage(mCE.message.channel, "Correct format is `h!cp $cmd <month> <year>`", 5_000)
@@ -237,15 +237,15 @@ object CPCommand : BotCommand {
     }
 
     private fun Hakibot.getCPsRegex(
-        name: String,
-        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+            name: String,
+            cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
     ): List<CustomPatreon> {
         return cpCol.find(or(CustomPatreon::name regex name, CustomPatreon::aliases regex name)).toList()
     }
 
     private fun Hakibot.getCPs(
-        names: List<String>,
-        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+            names: List<String>,
+            cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
     ): List<CustomPatreon?> {
         return List(names.size) { idx ->
             getCP(names[idx], cpCol)
@@ -253,8 +253,8 @@ object CPCommand : BotCommand {
     }
 
     private fun Hakibot.getCP(
-        name: String,
-        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+            name: String,
+            cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
     ): CustomPatreon? {
         return cpCol.findOne(or(CustomPatreon::name eq name, CustomPatreon::aliases contains name))
     }

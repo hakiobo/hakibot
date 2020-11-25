@@ -15,7 +15,7 @@ object OwOStat : BotCommand {
     override val name: String
         get() = "owostat"
     override val aliases: List<String>
-        get() = listOf("owos", "ostat")
+        get() = listOf("owos", "ostat", "stat")
     override val category: CommandCategory
         get() = CommandCategory.GUILD
     override val description: String
@@ -54,8 +54,9 @@ object OwOStat : BotCommand {
             sendMessage(mCE.message.channel, "Could not find any OwO's for that user in this server", 10_000)
         } else {
             query.normalize(mCE)
+            val username = getUserFromDB(Snowflake(query.user)).username!!
             mCE.message.channel.createEmbed {
-                title = "${client.getUser(Snowflake(userId))?.username}'s OwOs in ${mCE.getGuild()!!.name}"
+                title = "$username's OwOs in ${mCE.getGuild()!!.name}"
                 description = "__**Total**__: ${query.owoCount}\n"
                 field {
                     name = "Current Stats"

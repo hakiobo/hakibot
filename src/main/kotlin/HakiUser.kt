@@ -1,4 +1,4 @@
-data class HakiUser(val _id: String, val owoSettings: OWOSettings = OWOSettings(), val owoCount: UserOWOCount = UserOWOCount()) {
+data class HakiUser(val _id: String, val username: String? = null, val owoSettings: OWOSettings = OWOSettings(), val owoCount: UserOWOCount = UserOWOCount()) {
 }
 
 data class UserOWOCount(val count: Int = 0, val lastOwO: Long = 0)

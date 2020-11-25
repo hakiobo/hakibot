@@ -131,15 +131,27 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    fun getUserFromDB(userID: Snowflake): HakiUser {
-        val col = db.getCollection<HakiUser>("users")
+    suspend fun getUserFromDB(userID: Snowflake, u: User? = null, col: MongoCollection<HakiUser> = db.getCollection<HakiUser>("users")): HakiUser {
         val query = col.findOne(HakiUser::_id eq userID.value)
         return if (query == null) {
-            val user = HakiUser(userID.value)
+            val user = if (u == null) {
+                HakiUser(userID.value, client.getUser(userID)?.username ?: "Deleted User#${userID.value}")
+            } else {
+                HakiUser(userID.value, u.username)
+            }
             col.insertOne(user)
             user
         } else {
-            query
+            if (u != null && u.username != query.username) {
+                col.updateOne(HakiUser::_id eq query._id, setValue(HakiUser::username, u.username))
+                query.copy(username = u.username)
+            } else if (query.username == null) {
+                val name = client.getUser(userID)?.username ?: "Deleted User#${userID.value}"
+                col.updateOne(HakiUser::_id eq query._id, setValue(HakiUser::username, name))
+                query.copy(username = name)
+            } else {
+                query
+            }
         }
     }
 
@@ -188,7 +200,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         if (mCE.guildId == null) return handleDM(mCE)
 
         val guild = getGuildInfo(mCE.guildId!!)
-
+//        val user = getUserFromDB(mCE.message.author!!.id, mCE.message.author)
 
 
         if (guild.settings.enableWhen && mCE.message.content.filter(Char::isLetterOrDigit).takeLast(4)
@@ -212,12 +224,12 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
         val owoPre = guild.owoPrefix
         if (mCE.message.content.startsWith(GLOBAL_OWO_PREFIX, ignoreCase = true)) {
-            handleOWOCommand(mCE, guild, mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim())
+            handleOWOCommand(mCE, guild, mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(), getUserFromDB(mCE.message.author!!.id, mCE.message.author))
         } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
-            handleOWOCommand(mCE, guild, mCE.message.content.drop(owoPre.length).trim())
+            handleOWOCommand(mCE, guild, mCE.message.content.drop(owoPre.length).trim(), getUserFromDB(mCE.message.author!!.id, mCE.message.author))
         } else {
-            if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu")) {
-                countOwO(mCE, getUserFromDB(mCE.message.author!!.id), guild)
+            if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
+                countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
             }
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
@@ -264,21 +276,20 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         return null
     }
 
-    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String) {
+    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String, user: HakiUser) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.firstOrNull()) {
-            "hunt", "h" -> owoHuntOWOCMD(mCE)
-            "pray", "curse" -> owoPrayOWOCMD(mCE, split.first())
+            "hunt", "h" -> owoHuntOWOCMD(mCE, user)
+            "pray", "curse" -> owoPrayOWOCMD(mCE, split.first(), user)
             in owoCommands -> {
             }
-            else -> countOwO(mCE, getUserFromDB(mCE.message.author!!.id), guild)
+            else -> countOwO(mCE, user, guild)
         }
     }
 
-    private suspend fun owoHuntOWOCMD(mCE: MessageCreateEvent) {
+    private suspend fun owoHuntOWOCMD(mCE: MessageCreateEvent, user: HakiUser) {
         val authorID = mCE.message.author!!.id
         val col = db.getCollection<HakiUser>("users")
-        val user = getUserFromDB(authorID)
         if (user.owoSettings.huntRemind && !user.owoSettings.huntCD) {
             col.updateOne(
                     HakiUser::_id eq authorID.value,
@@ -295,10 +306,9 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    private suspend fun owoPrayOWOCMD(mCE: MessageCreateEvent, cmd: String) {
+    private suspend fun owoPrayOWOCMD(mCE: MessageCreateEvent, cmd: String, user: HakiUser) {
         val authorID = mCE.message.author!!.id
         val col = db.getCollection<HakiUser>("users")
-        val user = getUserFromDB(authorID)
         if (user.owoSettings.prayRemind && !user.owoSettings.prayCD) {
             col.updateOne(
                     HakiUser::_id eq authorID.value,
