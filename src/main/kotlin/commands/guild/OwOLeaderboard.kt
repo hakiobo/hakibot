@@ -10,8 +10,13 @@ import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
 import org.litote.kmongo.*
+import toInstant
 import java.awt.Color
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlin.reflect.KProperty1
+import kotlin.time.toKotlinDuration
 
 object OwOLeaderboard : BotCommand {
     override val name: String
@@ -77,6 +82,17 @@ object OwOLeaderboard : BotCommand {
                             value = "${type.stat.get(res)} OwOs"
                         }
                     }
+                    val timeLeft = type.untilReset(mCE.message.id)
+                    if (timeLeft != null) {
+                        footer {
+                            val d = timeLeft.toDays()
+                            val h = timeLeft.toHours() % 24
+                            val m = timeLeft.toMinutes() % 60
+                            val s = timeLeft.seconds % 60
+
+                            text = "${type.timeNote} ${d}D ${h}H ${m}M ${s}S"
+                        }
+                    }
                 }
             } else {
                 sendMessage(mCE.message.channel, "Invalid Format :(", 5_000)
@@ -87,16 +103,43 @@ object OwOLeaderboard : BotCommand {
 
     }
 
-    enum class RankingType(val stat: KProperty1<UserGuildOwOCount, Int>, val triggers: List<String>, val desc: String) {
-        TOTAL(UserGuildOwOCount::owoCount, listOf("all", "total"), ""),
-        YEAR(UserGuildOwOCount::yearlyCount, listOf("year", "yearly"), "Yearly "),
-        LAST_YEAR(UserGuildOwOCount::lastYearCount, listOf("lastyear", "prevyear", "ly", "py"), "Last Year's "),
-        MONTH(UserGuildOwOCount::monthlyCount, listOf("month", "m", "monthly"), "Monthly "),
-        LAST_MONTH(UserGuildOwOCount::lastMonthCount, listOf("lastmonth", "prevmonth", "lm", "pm"), "Last Month's "),
-        WEEK(UserGuildOwOCount::weeklyCount, listOf("week", "w", "weekly"), "Weekly "),
-        LAST_WEEK(UserGuildOwOCount::lastWeekCount, listOf("lastweek", "prevweek", "lw", "pw"), "Last Week's "),
-        DAY(UserGuildOwOCount::dailyCount, listOf("t", "today", "d", "day", "daily"), "Today's "),
-        YESTERDAY(UserGuildOwOCount::yesterdayCount, listOf("y", "yesterday", "yes", "yday", "pday", "prevday", "lday", "lastday"), "Yesterday's "),
+    fun toEndOfWeek(id: Snowflake): Duration? {
+        val time = id.toInstant().atZone(Hakibot.PST)
+        val endTime = time.toLocalDate().plusDays(7L - (time.dayOfWeek.value % 7)).atStartOfDay(Hakibot.PST)
+
+        return Duration.between(time, endTime)
+    }
+
+    fun toEndOfDay(id: Snowflake): Duration? {
+        val time = id.toInstant().atZone(Hakibot.PST)
+        val endTime = time.toLocalDate().plusDays(1).atStartOfDay(Hakibot.PST)
+        return Duration.between(time, endTime)
+    }
+
+    fun toEndOfMonth(id: Snowflake): Duration? {
+        val time = id.toInstant().atZone(Hakibot.PST)
+        val endTime = time.toLocalDate().plusMonths(1).withDayOfMonth(1).atStartOfDay(Hakibot.PST)
+
+        return Duration.between(time, endTime)
+    }
+
+    fun toEndOfYear(id: Snowflake): Duration? {
+        val time = id.toInstant().atZone(Hakibot.PST)
+        val endTime = time.toLocalDate().plusYears(1).withDayOfYear(1).atStartOfDay(Hakibot.PST)
+
+        return Duration.between(time, endTime)
+    }
+
+    enum class RankingType(val stat: KProperty1<UserGuildOwOCount, Int>, val triggers: List<String>, val desc: String, val untilReset: (Snowflake) -> Duration?, val timeNote: String) {
+        TOTAL(UserGuildOwOCount::owoCount, listOf("all", "total"), "", { null }, ""),
+        YEAR(UserGuildOwOCount::yearlyCount, listOf("year", "yearly"), "Yearly ", OwOLeaderboard::toEndOfYear, "Resets in"),
+        LAST_YEAR(UserGuildOwOCount::lastYearCount, listOf("lastyear", "prevyear", "ly", "py"), "Last Year's ", OwOLeaderboard::toEndOfYear, "Viewable for"),
+        MONTH(UserGuildOwOCount::monthlyCount, listOf("month", "m", "monthly"), "Monthly ", OwOLeaderboard::toEndOfMonth, "Resets in"),
+        LAST_MONTH(UserGuildOwOCount::lastMonthCount, listOf("lastmonth", "prevmonth", "lm", "pm"), "Last Month's ", OwOLeaderboard::toEndOfMonth, "Viewable for"),
+        WEEK(UserGuildOwOCount::weeklyCount, listOf("week", "w", "weekly"), "Weekly ", OwOLeaderboard::toEndOfWeek, "Resets in"),
+        LAST_WEEK(UserGuildOwOCount::lastWeekCount, listOf("lastweek", "prevweek", "lw", "pw"), "Last Week's ", OwOLeaderboard::toEndOfWeek, "Viewable for"),
+        DAY(UserGuildOwOCount::dailyCount, listOf("t", "today", "d", "day", "daily"), "Today's ", OwOLeaderboard::toEndOfDay, "Resets in"),
+        YESTERDAY(UserGuildOwOCount::yesterdayCount, listOf("y", "yesterday", "yes", "yday", "pday", "prevday", "lday", "lastday"), "Yesterday's ", OwOLeaderboard::toEndOfDay, "Viewable for"),
     }
 }
 

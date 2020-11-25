@@ -494,11 +494,12 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val GLOBAL_OWO_PREFIX = "owo"
         val PRAY_EMOJI = ReactionEmoji.Unicode("\ud83d\ude4f")
         val CURSE_EMOJI = ReactionEmoji.Unicode("\ud83d\udc7b")
+        val PST = ZoneId.of("PST", ZoneId.SHORT_IDS)
 
         fun isResetTime(): Boolean {
 
             Instant.now().atZone(
-                    ZoneId.of("PST", ZoneId.SHORT_IDS)
+                    PST
             ).run {
                 return hour == 0 && minute < 30
             }
