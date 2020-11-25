@@ -1,12 +1,9 @@
 package commands.guild
 
-import Hakibot
-import Settings
+import entities.Settings
 
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.AccessType
 import commands.utils.Argument
-import commands.utils.BotCommand
 import commands.utils.CommandUsage
 import kotlin.reflect.KProperty1
 

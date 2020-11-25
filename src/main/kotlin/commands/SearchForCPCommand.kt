@@ -1,6 +1,6 @@
 package commands
 
-import CustomPatreon
+import entities.CustomPatreon
 import Hakibot
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.behavior.channel.GuildMessageChannelBehavior
@@ -105,9 +105,9 @@ object SearchForCPCommand : BotCommand {
     }
 
     private suspend fun Hakibot.parseMessage(
-        message: Message,
-        col: MongoCollection<CustomPatreon>,
-        srcChannel: MessageChannelBehavior
+            message: Message,
+            col: MongoCollection<CustomPatreon>,
+            srcChannel: MessageChannelBehavior
     ): Int {
         if (message.author?.id?.longValue == Hakibot.OWO_ID) {
             val embed = message.embeds.firstOrNull()

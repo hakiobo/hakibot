@@ -1,8 +1,8 @@
 package commands.guild
 
-import HakiGuild
+import entities.HakiGuild
 import Hakibot
-import Settings
+import entities.Settings
 import com.gitlab.kordlib.common.entity.Permission
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand

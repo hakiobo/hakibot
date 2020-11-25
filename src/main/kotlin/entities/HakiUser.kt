@@ -1,3 +1,5 @@
+package entities
+
 data class HakiUser(val _id: String, val username: String? = null, val owoSettings: OWOSettings = OWOSettings(), val owoCount: UserOWOCount = UserOWOCount()) {
 }
 

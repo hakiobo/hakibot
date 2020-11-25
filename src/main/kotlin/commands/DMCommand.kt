@@ -3,7 +3,6 @@ package commands
 import Hakibot
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
-import qualityEmojis
 
 object DMCommand : BotCommand {
 

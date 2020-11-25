@@ -1,6 +1,6 @@
 package commands.guild
 
-import Settings
+import entities.Settings
 import commands.utils.AccessType
 import commands.utils.Argument
 import commands.utils.CommandUsage

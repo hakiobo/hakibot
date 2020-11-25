@@ -1,16 +1,14 @@
 package commands
 
-import CreationInfo
-import CustomPatreon
+import entities.CreationInfo
+import entities.CustomPatreon
 import Hakibot
 import com.gitlab.kordlib.core.behavior.channel.createEmbed
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import com.mongodb.client.MongoCollection
 import commands.utils.*
 import org.bson.conversions.Bson
 import org.litote.kmongo.*
-import java.awt.Color
 
 object CPCommand : BotCommand {
 

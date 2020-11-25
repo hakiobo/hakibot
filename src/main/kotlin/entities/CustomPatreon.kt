@@ -1,28 +1,30 @@
+package entities
+
 import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import org.bson.codecs.pojo.annotations.BsonId
 import java.awt.Color
 import kotlin.random.Random
 
 data class CustomPatreon(
-    @BsonId val name: String,
-    val hp: Int,
-    val str: Int,
-    val pr: Int,
-    val wp: Int,
-    val mag: Int,
-    val mr: Int,
-    val aliases: List<String> = emptyList(),
-    val creationInfo: CreationInfo? = null,
-    val lastUpdatedMS: Long = 0,
-    val imageLink: String? = null
+        @BsonId val name: String,
+        val hp: Int,
+        val str: Int,
+        val pr: Int,
+        val wp: Int,
+        val mag: Int,
+        val mr: Int,
+        val aliases: List<String> = emptyList(),
+        val creationInfo: CreationInfo? = null,
+        val lastUpdatedMS: Long = 0,
+        val imageLink: String? = null
 ) {
     constructor(
-        name: String,
-        stats: List<Int>,
-        aliases: List<String> = emptyList(),
-        creationInfo: CreationInfo? = null,
-        lastUpdatedMS: Long = 0,
-        imageLink: String? = null
+            name: String,
+            stats: List<Int>,
+            aliases: List<String> = emptyList(),
+            creationInfo: CreationInfo? = null,
+            lastUpdatedMS: Long = 0,
+            imageLink: String? = null
     ) : this(
         name,
         stats[0],

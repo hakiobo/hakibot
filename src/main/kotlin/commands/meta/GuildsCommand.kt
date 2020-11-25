@@ -1,10 +1,8 @@
 package commands.meta
 
 import Hakibot
-import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.entity.Guild
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import commands.utils.AccessType
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
 import commands.utils.CommandUsage

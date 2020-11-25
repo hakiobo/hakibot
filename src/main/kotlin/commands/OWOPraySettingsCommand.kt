@@ -2,8 +2,8 @@ package commands
 
 import commands.utils.BotCommand
 import Hakibot
-import HakiUser
-import OWOSettings
+import entities.HakiUser
+import entities.OWOSettings
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.Argument
 import commands.utils.CommandCategory

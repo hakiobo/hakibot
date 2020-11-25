@@ -1,6 +1,6 @@
 package commands.guild
 
-import HakiGuild
+import entities.HakiGuild
 import Hakibot
 import com.gitlab.kordlib.common.entity.Permission
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
@@ -43,8 +43,8 @@ object OWOPrefixCommand : BotCommand {
                 ) {
                     val col = db.getCollection<HakiGuild>("guilds")
 
-//                    if (col.find(HakiGuild::_id eq guildID).none()) {
-//                        col.insertOne(HakiGuild(guildID, owoPrefix = args.first()))
+//                    if (col.find(entities.HakiGuild::_id eq guildID).none()) {
+//                        col.insertOne(entities.HakiGuild(guildID, owoPrefix = args.first()))
 //                    } else {
                         col.updateOne(HakiGuild::_id eq guildID, setValue(HakiGuild::owoPrefix, args.first()))
 //                    }

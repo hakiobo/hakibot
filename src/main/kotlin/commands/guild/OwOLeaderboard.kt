@@ -1,9 +1,9 @@
 package commands.guild
 
-import HakiUser
+import entities.HakiUser
 import Hakibot
-import UserGuildOwOCount
-import UserGuildOwOCount.Companion.normalizeGuild
+import entities.UserGuildOwOCount
+import entities.UserGuildOwOCount.Companion.normalizeGuild
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.behavior.channel.createEmbed
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
@@ -13,10 +13,7 @@ import org.litote.kmongo.*
 import toInstant
 import java.awt.Color
 import java.time.Duration
-import java.time.LocalDateTime
-import java.time.ZoneId
 import kotlin.reflect.KProperty1
-import kotlin.time.toKotlinDuration
 
 object OwOLeaderboard : BotCommand {
     override val name: String

@@ -1,4 +1,4 @@
-import UserGuildOwOCount.Companion.countOwO
+import entities.UserGuildOwOCount.Companion.countOwO
 import com.gitlab.kordlib.common.entity.DiscordMessage
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.Kord
@@ -22,6 +22,7 @@ import commands.guild.*
 import commands.meta.*
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import entities.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
@@ -448,7 +449,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                         "Updated info for $name\nOld:\n$search\nNew:\n$new",
                         15_000
                 )
-                //                            col.updateOne(, setValue(CustomPatreon::aliases, als))
+                //                            col.updateOne(, setValue(entities.CustomPatreon::aliases, als))
             }
         }
     }

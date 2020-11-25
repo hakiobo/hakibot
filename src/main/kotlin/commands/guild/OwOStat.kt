@@ -1,7 +1,7 @@
 package commands.guild
 
 import Hakibot
-import UserGuildOwOCount
+import entities.UserGuildOwOCount
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.behavior.channel.createEmbed
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
