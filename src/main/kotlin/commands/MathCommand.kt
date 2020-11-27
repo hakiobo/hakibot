@@ -7,6 +7,8 @@ import commands.utils.ArgumentType
 import commands.utils.BotCommand
 import commands.utils.CommandUsage
 import math.evaluate
+import kotlin.math.E
+import kotlin.math.PI
 
 object MathCommand : BotCommand {
     override val name: String
@@ -23,11 +25,20 @@ object MathCommand : BotCommand {
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         client.runCatching {
-            evaluate(args.joinToString(""))
+            evaluate(
+                args.joinToString("").toLowerCase().map {
+                    when (it) {
+                        '[', '{' -> '('
+                        ']', '}' -> ')'
+                        else -> it
+                    }
+                }.joinToString(""),
+                mapOf("e" to E, "pi" to PI)
+            )
         }.onFailure {
             sendMessage(mCE.message.channel, "Could not parse your expression!")
         }.onSuccess {
-            sendMessage(mCE.message.channel, it.toString())
+            sendMessage(mCE.message.channel, if (it.toString().length >= 2000) "Answer was too long" else it.toString())
         }
     }
 }
