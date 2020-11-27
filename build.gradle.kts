@@ -10,7 +10,6 @@ repositories {
     mavenCentral()
     jcenter()
     maven(url = "https://dl.bintray.com/kordlib/Kord")
-    maven(url = "https://jitpack.io")
 }
 dependencies {
     testImplementation(kotlin("test-testng"))
@@ -18,7 +17,6 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:4.1.0")
     implementation("org.litote.kmongo:kmongo:4.1.2")
     implementation("org.slf4j:slf4j-simple:1.7.30")
-    implementation("com.github.cregus:expression-evaluator:1.0")
 
 //    implementation("org.litote.kmongo:kmongo-async:4.1.2")
 //    implementation("org.litote.kmongo:kmongo-coroutine:4.1.2")

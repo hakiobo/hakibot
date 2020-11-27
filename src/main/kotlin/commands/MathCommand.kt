@@ -6,7 +6,7 @@ import commands.utils.Argument
 import commands.utils.ArgumentType
 import commands.utils.BotCommand
 import commands.utils.CommandUsage
-import pl.kremblewski.expressionevaluator.evaluate
+import math.evaluate
 
 object MathCommand : BotCommand {
     override val name: String
