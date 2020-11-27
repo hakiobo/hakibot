@@ -35,50 +35,51 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
 
     private val triggers = mapOf(
-            "haki" to "is coding god",
-            "hika" to "god is coding",
-            "anvi" to "sewen sewenty",
-            "asono" to "waifu's inva", "asona" to "waifu's inva", "asano" to "waifu's inva",
-            "nea" to "js in codes",
-            "yez" to "doesn't code enough",
-            "furo" to "Furory?",
-            "shufi" to "your bow lol god down",
-            "sellchart" to "5 - B\n2.5 - F\n2 - P CP H\n1.67 - M\n1.5 - L G D\n1.2 - S\n1 - C E\n0.6 - U\n0.5 - R",
-            "licu" to "Should curse haki"
+        "haki" to "is coding god",
+        "hika" to "god is coding",
+        "anvi" to "sewen sewenty",
+        "asono" to "waifu's inva", "asona" to "waifu's inva", "asano" to "waifu's inva",
+        "nea" to "js in codes",
+        "yez" to "doesn't code enough",
+        "furo" to "Furory?",
+        "shufi" to "your bow lol god down",
+        "sellchart" to "5 - B\n2.5 - F\n2 - P CP H\n1.67 - M\n1.5 - L G D\n1.2 - S\n1 - C E\n0.6 - U\n0.5 - R",
+        "licu" to "Should curse haki"
     )
     val commands = listOf(
-            HelpCommand,
-            ReportCommand,
-            DMCommand,
-            PrefixCommand,
-            OWOPrefixCommand,
-            OWOHuntSettingsCMD,
-            OWOPraySettingsCommand,
-            CPCommand,
-            WhoIsCommand,
-            SuggestCommand,
-            SearchForCPCommand,
-            InviteCommand,
-            GuildsCommand,
-            ServerCommand,
-            LogoutCommand,
-            TriggerCommand,
-            WhenCommand,
-            UseGlobalPrefixCommand,
-            OwOStat,
-            OwOLeaderboard,
-            MathCommand,
+        HelpCommand,
+        ReportCommand,
+        DMCommand,
+        PrefixCommand,
+        OWOPrefixCommand,
+        OWOHuntSettingsCMD,
+        OWOPraySettingsCommand,
+        CPCommand,
+        WhoIsCommand,
+        SuggestCommand,
+        SearchForCPCommand,
+        InviteCommand,
+        GuildsCommand,
+        ServerCommand,
+        LogoutCommand,
+        TriggerCommand,
+        WhenCommand,
+        UseGlobalPrefixCommand,
+        OwOStat,
+        OwOLeaderboard,
+        MathCommand,
+        Ping,
     )
 
     suspend fun startUp() {
         val users = db.getCollection<HakiUser>("users")
         users.updateMany(
-                HakiUser::owoSettings / OWOSettings::huntCD eq true,
-                setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
+            HakiUser::owoSettings / OWOSettings::huntCD eq true,
+            setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
         )
         users.updateMany(
-                HakiUser::owoSettings / OWOSettings::prayCD eq true,
-                setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
+            HakiUser::owoSettings / OWOSettings::prayCD eq true,
+            setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
         )
         client.on<ReadyEvent> {
             messageChannelById(ONLINE_CHANNEL, "Online!")
@@ -133,7 +134,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    suspend fun getUserFromDB(userID: Snowflake, u: User? = null, col: MongoCollection<HakiUser> = db.getCollection<HakiUser>("users")): HakiUser {
+    suspend fun getUserFromDB(
+        userID: Snowflake,
+        u: User? = null,
+        col: MongoCollection<HakiUser> = db.getCollection<HakiUser>("users")
+    ): HakiUser {
         val query = col.findOne(HakiUser::_id eq userID.value)
         return if (query == null) {
             val user = if (u == null) {
@@ -206,7 +211,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
 
         if (guild.settings.enableWhen && mCE.message.content.filter(Char::isLetterOrDigit).takeLast(4)
-                        .toLowerCase() == "when"
+                .toLowerCase() == "when"
         ) {
             sendMessage(mCE.message.channel, "when", 10_000)
         }
@@ -226,9 +231,19 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
         val owoPre = guild.owoPrefix
         if (mCE.message.content.startsWith(GLOBAL_OWO_PREFIX, ignoreCase = true)) {
-            handleOWOCommand(mCE, guild, mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(), getUserFromDB(mCE.message.author!!.id, mCE.message.author))
+            handleOWOCommand(
+                mCE,
+                guild,
+                mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(),
+                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+            )
         } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
-            handleOWOCommand(mCE, guild, mCE.message.content.drop(owoPre.length).trim(), getUserFromDB(mCE.message.author!!.id, mCE.message.author))
+            handleOWOCommand(
+                mCE,
+                guild,
+                mCE.message.content.drop(owoPre.length).trim(),
+                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+            )
         } else {
             if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
                 countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
@@ -247,8 +262,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     }
 
     fun getGuildInfo(
-            guild: Snowflake,
-            col: MongoCollection<HakiGuild> = db.getCollection<HakiGuild>("guilds")
+        guild: Snowflake,
+        col: MongoCollection<HakiGuild> = db.getCollection<HakiGuild>("guilds")
     ): HakiGuild {
         return col.findOne(HakiGuild::_id eq guild.value) ?: HakiGuild(guild.value)
     }
@@ -291,14 +306,14 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val col = db.getCollection<HakiUser>("users")
         if (user.owoSettings.huntRemind && !user.owoSettings.huntCD) {
             col.updateOne(
-                    HakiUser::_id eq authorID.value,
-                    setValue(HakiUser::owoSettings / OWOSettings::huntCD, true)
+                HakiUser::_id eq authorID.value,
+                setValue(HakiUser::owoSettings / OWOSettings::huntCD, true)
             )
             client.launch {
                 delay(14500)
                 col.updateOne(
-                        HakiUser::_id eq authorID.value,
-                        setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
+                    HakiUser::_id eq authorID.value,
+                    setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
                 )
                 sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 4500)
             }
@@ -310,8 +325,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val col = db.getCollection<HakiUser>("users")
         if (user.owoSettings.prayRemind && !user.owoSettings.prayCD) {
             col.updateOne(
-                    HakiUser::_id eq authorID.value,
-                    setValue(HakiUser::owoSettings / OWOSettings::prayCD, true)
+                HakiUser::_id eq authorID.value,
+                setValue(HakiUser::owoSettings / OWOSettings::prayCD, true)
             )
             if (cmd.startsWith("p")) {
                 mCE.message.addReaction(PRAY_EMOJI)
@@ -323,8 +338,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 delay(300_000)
 //                val resp =
                 col.updateOne(
-                        HakiUser::_id eq authorID.value,
-                        setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
+                    HakiUser::_id eq authorID.value,
+                    setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
                 )
                 mCE.message.channel.createMessage("${mCE.message.author!!.mention} pray/curse cooldown is done")
 
@@ -355,7 +370,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
 
         val split = (if (mCE.message.content.startsWith("h!", ignoreCase = true)) mCE.message.content.drop(2)
-                .trim() else mCE.message.content).split(Pattern.compile("\\s+"))
+            .trim() else mCE.message.content).split(Pattern.compile("\\s+"))
         val userCMD = split.first().toLowerCase()
 
         val args = split.drop(1)
@@ -378,10 +393,10 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 //    internal suspend fun getHaki() = client.getUser(Snowflake(292483348738080769))!!
 
     internal fun getCPAdders() =
-            arrayOf(
-                    HAKIOBO_ID
+        arrayOf(
+            HAKIOBO_ID
 //        , client.getUser(Snowflake( 304511726907293697))
-            )
+        )
 
     internal suspend fun sendMessage(channel: MessageChannelBehavior, message: String, deleteAfterMS: Long = 0L) {
         client.launch {
@@ -404,7 +419,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    internal suspend fun messageChannelById(channelId: Long, message: String, embed: EmbedBuilder? = null): DiscordMessage {
+    internal suspend fun messageChannelById(
+        channelId: Long,
+        message: String,
+        embed: EmbedBuilder? = null
+    ): DiscordMessage {
         return client.rest.channel.createMessage(channelId.toString()) {
             content = message
             this.embed = embed
@@ -446,9 +465,9 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 //                messageChannelById(CP_UPD_CHANNEL, "$search\n----->\n$new\nfrom ${mCE.message.getGuild().name}")
                 mCE.message.addReaction(ReactionEmoji.Unicode("\ud83d\udd04"))
                 sendMessage(
-                        mCE.message.channel,
-                        "Updated info for $name\nOld:\n$search\nNew:\n$new",
-                        15_000
+                    mCE.message.channel,
+                    "Updated info for $name\nOld:\n$search\nNew:\n$new",
+                    15_000
                 )
                 //                            col.updateOne(, setValue(entities.CustomPatreon::aliases, als))
             }
@@ -464,16 +483,16 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val name = embed.title!!.split(" ").last()
         val base = split.lastIndex
         val stats = arrayOf(
-                split[base - 11],
-                split[base - 9],
-                split[base - 7],
-                split[base - 5],
-                split[base - 3],
-                split[base - 1]
+            split[base - 11],
+            split[base - 9],
+            split[base - 7],
+            split[base - 5],
+            split[base - 3],
+            split[base - 1]
         ).map { it.toInt() }
         val als =
-                embed.description!!.split("\n**Alias:**").last().split("\n**Points:**").first().split(",")
-                        .map { it.trim() }.filter { it != "None" }
+            embed.description!!.split("\n**Alias:**").last().split("\n**Points:**").first().split(",")
+                .map { it.trim() }.filter { it != "None" }
         val date = embed.description!!.split("\n*for being ")[1].split(" ").take(3).drop(1)
         val creationInfo = CreationInfo(CreationInfo.getMonthNum(date.first())!!, date.last().toInt())
         val timestamp = message.id.longValue ushr 22
@@ -501,7 +520,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         fun isResetTime(): Boolean {
 
             Instant.now().atZone(
-                    PST
+                PST
             ).run {
                 return hour == 0 && minute < 30
             }
@@ -510,4 +529,4 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     }
 }
 
-fun Snowflake.toInstant(): Instant = Instant.ofEpochMilli((longValue shr 22) + 1420070400000)
+fun Snowflake.toInstant(): Instant = Instant.ofEpochMilli((longValue ushr 22) + 1420070400000L)
