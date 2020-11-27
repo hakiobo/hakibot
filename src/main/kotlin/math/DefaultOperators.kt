@@ -1,17 +1,13 @@
 package math
 
-
-import java.math.BigDecimal
-import java.math.MathContext
-import java.math.RoundingMode
+import kotlin.math.pow
 
 object DefaultOperators {
-    var mathContext = MathContext(10, RoundingMode.HALF_EVEN)
 
-    val addition: Function2<BigDecimal> = { a, b -> a + b }
-    val subtraction: Function2<BigDecimal> = { a, b -> a - b }
-    val multiplication: Function2<BigDecimal> = { a, b -> a * b }
-    val division: Function2<BigDecimal> = { a, b -> a.divide(b, mathContext) }
-    val exponentiation: Function2<BigDecimal> = { a, b -> a.pow(b.toInt()) }
-    val modulo: Function2<BigDecimal> = { a, b -> a % b }
+    val addition: Function2<Double> = { a, b -> a + b }
+    val subtraction: Function2<Double> = { a, b -> a - b }
+    val multiplication: Function2<Double> = { a, b -> a * b }
+    val division: Function2<Double> = { a, b -> a / b}
+    val exponentiation: Function2<Double> = { a, b -> a.pow(b) }
+    val modulo: Function2<Double> = { a, b -> a % b }
 }

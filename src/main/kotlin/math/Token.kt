@@ -3,37 +3,35 @@ package math
 import java.math.BigDecimal
 
 sealed class Token {
-    abstract val value: BigDecimal
+    abstract val value: Double
 
-    data class Number(override val value: BigDecimal) : Token() {
-        constructor(value: kotlin.Number) : this(value.toBigDecimal())
-    }
+    data class Number(override val value: Double) : Token()
 
     sealed class Unary : Token() {
         abstract val token: Token
 
         data class Plus(override val token: Token) : Unary() {
-            override val value: BigDecimal
-                get() = token.value.plus()
+            override val value: Double
+                get() = token.value
         }
 
         data class Minus(override val token: Token) : Unary() {
-            override val value: BigDecimal
-                get() = token.value.negate()
+            override val value: Double
+                get() = -token.value
         }
     }
 
     data class Operator(
         val leftToken: Token,
         val rightToken: Token,
-        val operation: Function2<BigDecimal>
+        val operation: Function2<Double>
     ) : Token() {
-        override val value: BigDecimal
+        override val value: Double
             get() = operation(leftToken.value, rightToken.value)
     }
 
-    data class Variable(val name: String, override val value: BigDecimal) : Token() {
-        constructor(name: String, value: kotlin.Number) : this(name, value.toBigDecimal())
+    data class Variable(val name: String, override val value: Double) : Token() {
+        constructor(name: String, value: kotlin.Number) : this(name, value.toDouble())
     }
 
     sealed class Function : Token() {
@@ -42,9 +40,9 @@ sealed class Token {
         data class OneParam(
             override val name: String,
             val token: Token,
-            val function1: Function1<BigDecimal>
+            val function1: Function1<Double>
         ) : Function() {
-            override val value: BigDecimal
+            override val value: Double
                 get() = function1(token.value)
         }
 
@@ -52,9 +50,9 @@ sealed class Token {
             override val name: String,
             val firstToken: Token,
             val secondToken: Token,
-            val function2: Function2<BigDecimal>
+            val function2: Function2<Double>
         ) : Function() {
-            override val value: BigDecimal
+            override val value: Double
                 get() = function2(firstToken.value, secondToken.value)
         }
     }

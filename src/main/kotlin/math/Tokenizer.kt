@@ -1,11 +1,13 @@
-package math //modified from original code
+package math
 
-import java.math.BigDecimal
+import kotlin.math.*
+
+//modified from original code
 
 object Tokenizer {
     private val operators = mutableMapOf<Char, Operator>()
-    private val oneParamFunctions = mutableMapOf<String, Function1<BigDecimal>>()
-    private val twoParamFunctions = mutableMapOf<String, Function2<BigDecimal>>()
+    private val oneParamFunctions = mutableMapOf<String, Function1<Double>>()
+    private val twoParamFunctions = mutableMapOf<String, Function2<Double>>()
 
     init {
         registerOperator('+', 1, DefaultOperators.addition)
@@ -16,29 +18,31 @@ object Tokenizer {
         registerOperator('%', 2, DefaultOperators.modulo)
 
         registerFunction("", DefaultFunctions.parentheses)
-        registerFunction("abs", DefaultFunctions.absolute)
-        registerFunction("sqrt", DefaultFunctions.squareRoot)
-        registerFunction("cbrt", DefaultFunctions.cubeRoot)
-        registerFunction("ceil", DefaultFunctions.ceil)
-        registerFunction("floor", DefaultFunctions.floor)
+        registerFunction("abs", ::abs)
+        registerFunction("sqrt", ::sqrt)
+        registerFunction("cbrt", Math::cbrt)
+        registerFunction("ceil", ::ceil)
+        registerFunction("floor", ::floor)
         registerFunction("sin", DefaultFunctions.sine)
         registerFunction("cos", DefaultFunctions.cosine)
+        registerFunction("sinr", ::sin)
+        registerFunction("cosr", ::cos)
 
-        registerFunction("round", DefaultFunctions.round)
+        registerFunction("round", DefaultFunctions.rnd)
         registerFunction("pow", DefaultFunctions.exponentiation)
-        registerFunction("min", DefaultFunctions.min)
-        registerFunction("max", DefaultFunctions.max)
+        registerFunction("min", ::min)
+        registerFunction("max", ::max)
     }
 
-    fun registerOperator(symbol: Char, precedence: Int, operation: Function2<BigDecimal>) {
+    fun registerOperator(symbol: Char, precedence: Int, operation: Function2<Double>) {
         operators[symbol] = Operator(symbol, precedence, operation)
     }
 
-    fun registerFunction(name: String, function1: Function1<BigDecimal>) {
+    fun registerFunction(name: String, function1: Function1<Double>) {
         oneParamFunctions[name] = function1
     }
 
-    fun registerFunction(name: String, function2: Function2<BigDecimal>) {
+    fun registerFunction(name: String, function2: Function2<Double>) {
         twoParamFunctions[name] = function2
     }
 
@@ -52,7 +56,7 @@ object Tokenizer {
         }
 
         if (expression.isUnsignedNumber()) {
-            return Token.Number(expression.toBigDecimal())
+            return Token.Number(expression.toDouble())
         }
 
         if (expression in data) {
