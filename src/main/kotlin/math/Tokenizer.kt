@@ -1,4 +1,4 @@
-package math
+package math //modified from original code
 
 import java.math.BigDecimal
 
@@ -63,8 +63,8 @@ object Tokenizer {
             val parts = expression.splitBySymbolOutsideParentheses(operator.symbol)
             if (parts.size > 1) {
                 return Token.Operator(
-                    leftToken = parse(parts[0], data),
-                    rightToken = parse(parts[1], data),
+                    leftToken = parse(parts.dropLast(1).joinToString(operator.symbol.toString()), data),
+                    rightToken = parse(parts.last(), data),
                     operation = operator.operation
                 )
             }
