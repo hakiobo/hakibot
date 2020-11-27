@@ -12,7 +12,8 @@ object MathCommand : BotCommand {
     override val name: String
         get() = "math"
     override val description: String
-        get() = "Let Hakibot do some math for you!"
+        get() = "Let Hakibot do some math for you!\n" +
+                "Note: you may get unexpected results. Hakibot thinks 1+1+1=2 for some reason"
     override val usages: List<CommandUsage>
         get() = listOf(
             CommandUsage(
@@ -22,15 +23,12 @@ object MathCommand : BotCommand {
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        if (args.isEmpty()) {
+        client.runCatching {
+            evaluate(args.joinToString(""))
+        }.onFailure {
             sendMessage(mCE.message.channel, "Could not parse your expression!")
-        } else {
-            try {
-                val res = evaluate(args.joinToString(""))
-                sendMessage(mCE.message.channel, res.toString())
-            } catch (e: Exception) {
-                sendMessage(mCE.message.channel, "Could not parse your expression!")
-            }
+        }.onSuccess {
+            sendMessage(mCE.message.channel, it.toString())
         }
     }
 }

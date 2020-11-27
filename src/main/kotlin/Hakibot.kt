@@ -26,7 +26,6 @@ import entities.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
-import pl.kremblewski.expressionevaluator.evaluate
 import java.lang.Exception
 import java.time.Instant
 import java.time.ZoneId
@@ -368,7 +367,10 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 cmd.runCMD(this, mCE, args)
             }
         } else {
-            messageChannelById(DM_CHANNEL, "${mCE.message.author?.tag ?: "no author"}: ${mCE.message.content}")
+            messageChannelById(DM_CHANNEL, "", EmbedBuilder().apply {
+                title = mCE.message.author?.tag ?: "no author"
+                description = mCE.message.content
+            })
         }
 
     }
@@ -494,7 +496,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val GLOBAL_OWO_PREFIX = "owo"
         val PRAY_EMOJI = ReactionEmoji.Unicode("\ud83d\ude4f")
         val CURSE_EMOJI = ReactionEmoji.Unicode("\ud83d\udc7b")
-        val PST = ZoneId.of("PST", ZoneId.SHORT_IDS)
+        val PST: ZoneId = ZoneId.of("PST", ZoneId.SHORT_IDS)
 
         fun isResetTime(): Boolean {
 
