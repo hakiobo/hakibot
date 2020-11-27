@@ -12,8 +12,7 @@ object MathCommand : BotCommand {
     override val name: String
         get() = "math"
     override val description: String
-        get() = "Let Hakibot do some math for you!\n" +
-                "Note: you may get unexpected results. Hakibot thinks 1+1+1=2 for some reason"
+        get() = "Let Hakibot do some math for you!\n"
     override val usages: List<CommandUsage>
         get() = listOf(
             CommandUsage(
