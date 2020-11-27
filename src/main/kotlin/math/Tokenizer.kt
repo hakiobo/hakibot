@@ -48,7 +48,7 @@ object Tokenizer {
         }
 
         if (expression.startsWith('-')) {
-            return Token.Unary.Minus(parse(expression.substring(1), data))
+            return parse("0$expression", data)
         }
 
         if (expression.isUnsignedNumber()) {
