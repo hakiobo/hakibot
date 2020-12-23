@@ -15,15 +15,15 @@ object GuildsCommand : BotCommand {
     override val description: String
         get() = "Lists the guilds Hakibot is a part of"
     override val aliases: List<String>
-        get() = listOf("guildcount")
+        get() = listOf("guildcount", "servers", "servercount")
     override val category: CommandCategory
         get() = CommandCategory.HAKIBOT
     override val usages: List<CommandUsage>
         get() = listOf(CommandUsage(listOf(), "Lists the guilds Hakibot is currently in"))
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-            val guilds = mutableListOf<Guild>()
-            client.guilds.onEach { guilds.add(it) }.collect()
-            mCE.message.channel.createMessage("${guilds.size} Hakibot Guilds")
+        val guilds = mutableListOf<Guild>()
+        client.guilds.onEach { guilds.add(it) }.collect()
+        mCE.message.channel.createMessage("${guilds.size} Hakibot Guilds")
     }
 }
