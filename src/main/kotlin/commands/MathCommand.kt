@@ -9,6 +9,7 @@ import commands.utils.CommandUsage
 import math.evaluate
 import kotlin.math.E
 import kotlin.math.PI
+import kotlin.math.sqrt
 
 object MathCommand : BotCommand {
     override val name: String
@@ -33,7 +34,13 @@ object MathCommand : BotCommand {
                         else -> it
                     }
                 }.joinToString(""),
-                mapOf("e" to E, "pi" to PI)
+                mapOf(
+                    "e" to E,
+                    "pi" to PI,
+                    "phi" to (sqrt(5.0) + 1) / 2,
+                    "inf" to Double.POSITIVE_INFINITY,
+                    "infinity" to Double.POSITIVE_INFINITY
+                )
             )
         }.onFailure {
             sendMessage(mCE.message.channel, "Could not parse your expression!")

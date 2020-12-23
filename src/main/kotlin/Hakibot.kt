@@ -251,11 +251,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
             if (!guild.settings.allowGlobalPrefix) {
-                mCE.message.channel.createMessage("Global Bot prefix Disabled\nBot prefix is $pre")
+                mCE.message.channel.createMessage("Global $BOT_NAME prefix Disabled\nServer $BOT_NAME prefix is $pre")
             } else if (GLOBAL_PREFIX == pre) {
-                mCE.message.channel.createMessage("Bot prefix is $pre")
+                mCE.message.channel.createMessage("$BOT_NAME prefix is $pre")
             } else {
-                mCE.message.channel.createMessage("Global bot prefix is $GLOBAL_PREFIX\nServer bot prefix is $pre")
+                mCE.message.channel.createMessage("Global $BOT_NAME prefix is $GLOBAL_PREFIX\nServer $BOT_NAME prefix is $pre")
             }
         }
 
@@ -310,7 +310,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 setValue(HakiUser::owoSettings / OWOSettings::huntCD, true)
             )
             client.launch {
-                delay(14500)
+                delay(15_000)
                 col.updateOne(
                     HakiUser::_id eq authorID.value,
                     setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
@@ -336,12 +336,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
             client.launch {
                 delay(300_000)
-//                val resp =
                 col.updateOne(
                     HakiUser::_id eq authorID.value,
                     setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
                 )
-                mCE.message.channel.createMessage("${mCE.message.author!!.mention} pray/curse cooldown is done")
+                sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} pray/curse cooldown is done")
 
 //                delay(10_000)
 //                resp.delete()
@@ -385,6 +384,12 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             messageChannelById(DM_CHANNEL, "", EmbedBuilder().apply {
                 title = mCE.message.author?.tag ?: "no author"
                 description = mCE.message.content
+                if (mCE.message.author != null) {
+                    footer {
+                        text = mCE.message.author!!.id.value
+                    }
+                }
+
             })
         }
 
@@ -522,7 +527,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             Instant.now().atZone(
                 PST
             ).run {
-                return hour == 0 && minute < 30
+                return hour == 0
             }
         }
 
