@@ -73,15 +73,6 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     )
 
     suspend fun startUp() {
-        val users = db.getCollection<HakiUser>("users")
-        users.updateMany(
-            HakiUser::owoSettings / OWOSettings::huntCD eq true,
-            setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
-        )
-        users.updateMany(
-            HakiUser::owoSettings / OWOSettings::prayCD eq true,
-            setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
-        )
         client.on<ReadyEvent> {
             messageChannelById(ONLINE_CHANNEL, "Online!")
         }
@@ -294,7 +285,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String, user: HakiUser) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.firstOrNull()) {
-            "hunt", "h" -> owoHuntOWOCMD(mCE, user)
+            "hunt", "h", "catch" -> owoHuntOWOCMD(mCE, user)
             "pray", "curse" -> owoPrayOWOCMD(mCE, split.first(), user)
             in owoCommands -> {
             }
@@ -305,18 +296,15 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     private suspend fun owoHuntOWOCMD(mCE: MessageCreateEvent, user: HakiUser) {
         val authorID = mCE.message.author!!.id
         val col = db.getCollection<HakiUser>("users")
-        if (user.owoSettings.huntRemind && !user.owoSettings.huntCD) {
+        val time = mCE.message.id.toInstant().toEpochMilli()
+        if (user.owoSettings.huntRemind && (time - user.owoSettings.lastHunt) >= 15 * 1000) {
             col.updateOne(
                 HakiUser::_id eq authorID.value,
-                setValue(HakiUser::owoSettings / OWOSettings::huntCD, true)
+                setValue(HakiUser::owoSettings / OWOSettings::lastHunt, time)
             )
             client.launch {
                 delay(15_000)
-                col.updateOne(
-                    HakiUser::_id eq authorID.value,
-                    setValue(HakiUser::owoSettings / OWOSettings::huntCD, false)
-                )
-                sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 4500)
+                sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 5_000)
             }
         }
     }
@@ -324,10 +312,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     private suspend fun owoPrayOWOCMD(mCE: MessageCreateEvent, cmd: String, user: HakiUser) {
         val authorID = mCE.message.author!!.id
         val col = db.getCollection<HakiUser>("users")
-        if (user.owoSettings.prayRemind && !user.owoSettings.prayCD) {
+        val time = mCE.message.id.toInstant().toEpochMilli()
+        if (user.owoSettings.prayRemind && (time - user.owoSettings.lastPray) >= 5 * 60 * 1000) {
             col.updateOne(
                 HakiUser::_id eq authorID.value,
-                setValue(HakiUser::owoSettings / OWOSettings::prayCD, true)
+                setValue(HakiUser::owoSettings / OWOSettings::lastPray, time)
             )
             if (cmd.startsWith("p")) {
                 mCE.message.addReaction(PRAY_EMOJI)
@@ -337,10 +326,6 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
             client.launch {
                 delay(300_000)
-                col.updateOne(
-                    HakiUser::_id eq authorID.value,
-                    setValue(HakiUser::owoSettings / OWOSettings::prayCD, false)
-                )
                 sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} pray/curse cooldown is done")
 
 //                delay(10_000)
@@ -395,8 +380,6 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
 
     }
-
-//    internal suspend fun getHaki() = client.getUser(Snowflake(292483348738080769))!!
 
     internal fun getCPAdders() =
         arrayOf(
