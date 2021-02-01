@@ -77,7 +77,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             messageChannelById(ONLINE_CHANNEL, "Online!")
         }
         client.on<ReactionAddEvent> {
-            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") &&  guildId?.longValue == HAKIBOT_SERVER) {
+            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.longValue == HAKIBOT_SERVER || channelId.longValue == LXV_ALERT_CHANNEL)) {
                 val embed = getMessage().embeds.firstOrNull()
                 if (embed?.author?.name == "Today's Available Weapons") {
                     readShopWeapon(embed.description!!).forEach {
@@ -94,7 +94,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             }
         }
         client.on<MessageUpdateEvent> {
-            if (new.author?.id == OWO_ID.toString() && this.new.guildId?.toLong() == HAKIBOT_SERVER) {
+            if (new.author?.id == OWO_ID.toString() && (this.new.guildId?.toLong() == HAKIBOT_SERVER || this.new.channelId.toLong() == LXV_ALERT_CHANNEL)) {
                 if (new.embeds?.firstOrNull()?.author?.name == "Today's Available Weapons") {
                     try {
 
@@ -303,7 +303,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 setValue(HakiUser::owoSettings / OWOSettings::lastHunt, time)
             )
             client.launch {
-                delay(15_000)
+                delay((15_000 + time - Instant.now().toEpochMilli()).coerceAtLeast(1))
                 sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 5_000)
             }
         }
@@ -323,9 +323,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             } else {
                 mCE.message.addReaction(CURSE_EMOJI)
             }
-
             client.launch {
-                delay(300_000)
+                delay((300_000 + time - Instant.now().toEpochMilli()).coerceAtLeast(1))
                 sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} pray/curse cooldown is done")
 
 //                delay(10_000)
@@ -492,6 +491,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val BOT_NAME = "HakiBot"
         const val HAKIBOT_SERVER = 758479736564875265
         const val LXV_SERVER = 714152739252338749
+        const val LXV_ALERT_CHANNEL = 714178162757599344
         const val ONLINE_CHANNEL = 761020851029803078
         const val CP_ADD_CHANNEL = 766050133430239243
         const val CP_UPD_CHANNEL = 766050160949330001
