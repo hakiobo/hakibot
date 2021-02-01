@@ -253,7 +253,7 @@ object OwOLeaderboard : BotCommand {
         val note: String?,
         val getIdDataPairs: (MessageCreateEvent, TimeUnit, Int, MongoCollection<UserGuildOwOCount>) -> List<Pair<Long, Int>>
     ) {
-        TOTAL(null, OwOLeaderboard::getCurrentIdDataPairs),
+        TOTAL(null, OwOLeaderboard::getTotalIdDataPairs),
         CURRENT("Resets in", OwOLeaderboard::getCurrentIdDataPairs),
         PREVIOUS("Viewable for", OwOLeaderboard::getPreviousIdDataPairs),
     }
