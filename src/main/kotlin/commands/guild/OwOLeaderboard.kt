@@ -5,7 +5,6 @@ import entities.UserGuildOwOCount
 import com.gitlab.kordlib.common.entity.Snowflake
 import com.gitlab.kordlib.core.behavior.channel.createEmbed
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import com.mongodb.client.MongoCollection
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
 import entities.HakiUser
@@ -57,9 +56,9 @@ object OwOLeaderboard : BotCommand {
             }
             if (valid) {
                 val userCol = db.getCollection<HakiUser>("users")
-                size.coerceAtLeast(3).coerceAtMost(15)
+                size = size.coerceAtLeast(3).coerceAtMost(25)
                 val result =
-                    type.interval.getIdDataPairs(mCE, type.unit, size, db.getCollection<UserGuildOwOCount>("owo-count"))
+                    type.interval.getIdDataPairs(this, mCE, type.unit, size)
 
                 val filters = List(result.size) {
                     HakiUser::_id eq result[it].first.toString()
@@ -69,6 +68,9 @@ object OwOLeaderboard : BotCommand {
                 mCE.message.channel.createEmbed {
                     color = Color(0xABCDEF)
                     title = "${type.desc}OwO Leaderboard for ${mCE.getGuild()?.name ?: "No Name????"}"
+                    if (type == RankingType.GLOBAL) {
+                        title = "${type.desc}OwO Leaderboard"
+                    }
                     for (x in result.indices) {
                         val res = result[x]
                         val username =
@@ -198,12 +200,12 @@ object OwOLeaderboard : BotCommand {
 
 
     private fun getTotalIdDataPairs(
+        bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
         size: Int,
-        col: MongoCollection<UserGuildOwOCount>
     ): List<Pair<Long, Int>> {
-        return col.aggregate<UserGuildOwOCount>(
+        return bot.db.getCollection<UserGuildOwOCount>("owo-count").aggregate<UserGuildOwOCount>(
             match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
             sort(descending(unit.curStat)),
             limit(size)
@@ -211,12 +213,12 @@ object OwOLeaderboard : BotCommand {
     }
 
     private fun getCurrentIdDataPairs(
+        bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
         size: Int,
-        col: MongoCollection<UserGuildOwOCount>
     ): List<Pair<Long, Int>> {
-        return col.aggregate<UserGuildOwOCount>(
+        return bot.db.getCollection<UserGuildOwOCount>("owo-count").aggregate<UserGuildOwOCount>(
             match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
             match(UserGuildOwOCount::lastOWO gte unit.start(mCE.message.id).toEpochMilli()),
             sort(descending(unit.curStat)),
@@ -225,13 +227,14 @@ object OwOLeaderboard : BotCommand {
     }
 
     private fun getPreviousIdDataPairs(
+        bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
         size: Int,
-        col: MongoCollection<UserGuildOwOCount>
     ): List<Pair<Long, Int>> {
         val start = unit.start(mCE.message.id).toEpochMilli()
         val prevStart = unit.prevStart(mCE.message.id).toEpochMilli()
+        val col = bot.db.getCollection<UserGuildOwOCount>("owo-count")
         return col.aggregate<UserGuildOwOCount>(
             match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
             match(UserGuildOwOCount::lastOWO gte start),
@@ -249,10 +252,23 @@ object OwOLeaderboard : BotCommand {
             ).sortedByDescending { it.second }.take(size)
     }
 
+    private fun getGlobalIdPairs(
+        bot: Hakibot,
+        mCE: MessageCreateEvent,
+        unit: TimeUnit,
+        size: Int,
+    ): List<Pair<Long, Int>> {
+        return bot.db.getCollection<HakiUser>("users").aggregate<HakiUser>(
+            sort(descending(HakiUser::owoCount)),
+            limit(size)
+        ).toList().map { Pair(it._id.toLong(), it.owoCount.count) }
+    }
+
     private enum class IntervalType(
         val note: String?,
-        val getIdDataPairs: (MessageCreateEvent, TimeUnit, Int, MongoCollection<UserGuildOwOCount>) -> List<Pair<Long, Int>>
+        val getIdDataPairs: (Hakibot, MessageCreateEvent, TimeUnit, Int) -> List<Pair<Long, Int>>
     ) {
+        GLOBAL(null, OwOLeaderboard::getGlobalIdPairs),
         TOTAL(null, OwOLeaderboard::getTotalIdDataPairs),
         CURRENT("Resets in", OwOLeaderboard::getCurrentIdDataPairs),
         PREVIOUS("Viewable for", OwOLeaderboard::getPreviousIdDataPairs),
@@ -264,6 +280,7 @@ object OwOLeaderboard : BotCommand {
         val interval: IntervalType,
         val unit: TimeUnit,
     ) {
+        GLOBAL(listOf("g", "global"), "Global ", IntervalType.GLOBAL, TimeUnit.TOTAL),
         TOTAL(listOf("all", "total"), "", IntervalType.TOTAL, TimeUnit.TOTAL),
         YEAR(listOf("year", "yearly"), "Yearly ", IntervalType.CURRENT, TimeUnit.YEAR),
         LAST_YEAR(listOf("lastyear", "prevyear", "ly", "py"), "Last Year's ", IntervalType.PREVIOUS, TimeUnit.YEAR),

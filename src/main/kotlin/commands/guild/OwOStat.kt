@@ -9,6 +9,7 @@ import commands.utils.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
+import toInstant
 import java.awt.Color
 
 object OwOStat : BotCommand {
@@ -23,10 +24,13 @@ object OwOStat : BotCommand {
 
     override val usages: List<CommandUsage>
         get() = listOf(
-                CommandUsage(listOf(), "Gets your OwO stats in this server"),
-                CommandUsage(listOf(
-                        Argument(listOf("userId", "userMention"), ChoiceType.DESCRIPTION)),
-                        "Gets the OwO stats for the given user in this server"),
+            CommandUsage(listOf(), "Gets your OwO stats in this server"),
+            CommandUsage(
+                listOf(
+                    Argument(listOf("userId", "userMention"), ChoiceType.DESCRIPTION)
+                ),
+                "Gets the OwO stats for the given user in this server"
+            ),
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
@@ -49,10 +53,12 @@ object OwOStat : BotCommand {
     }
 
     private suspend fun Hakibot.displayOwOStats(mCE: MessageCreateEvent, userId: Long) {
-        val query = db.getCollection<UserGuildOwOCount>("owo-count").findOne { UserGuildOwOCount::_id eq "$userId|${mCE.guildId!!.value}" }
+        val query = db.getCollection<UserGuildOwOCount>("owo-count")
+            .findOne { UserGuildOwOCount::_id eq "$userId|${mCE.guildId!!.value}" }
         if (query == null) {
             sendMessage(mCE.message.channel, "Could not find any OwO's for that user in this server", 10_000)
         } else {
+            val now = mCE.message.id.toInstant().atZone(Hakibot.PST)
             query.normalize(mCE)
             val username = getUserFromDB(Snowflake(query.user)).username!!
             mCE.message.channel.createEmbed {
@@ -62,15 +68,15 @@ object OwOStat : BotCommand {
                     name = "Current Stats"
                     value = "__Today__: ${query.dailyCount}\n" +
                             "__This Week__: ${query.weeklyCount}\n" +
-                            "__This Month__: ${query.monthlyCount}\n" +
-                            "__This Year__: ${query.yearlyCount}"
+                            "__${now.month.name.toLowerCase().capitalize()}__: ${query.monthlyCount}\n" +
+                            "__${now.year}__: ${query.yearlyCount}"
                 }
                 field {
                     name = "Past Stats"
                     value = "__Yesterday__: ${query.yesterdayCount}\n" +
                             "__Last Week__: ${query.lastWeekCount}\n" +
-                            "__Last Month__: ${query.lastMonthCount}\n" +
-                            "__Last Year__: ${query.lastYearCount}"
+                            "__${now.minusMonths(1).month.name.toLowerCase().capitalize()}__: ${query.lastMonthCount}\n" +
+                            "__${now.year - 1}__: ${query.lastYearCount}"
                 }
                 color = Color(0xABCDEF)
             }

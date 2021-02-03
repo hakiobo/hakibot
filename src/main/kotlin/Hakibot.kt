@@ -19,6 +19,10 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import commands.*
 import commands.guild.*
+import commands.hidden.DMCommand
+import commands.hidden.GlobalDisableCommand
+import commands.hidden.LogoutCommand
+import commands.hidden.SearchForCPCommand
 import commands.meta.*
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
@@ -30,9 +34,20 @@ import java.lang.Exception
 import java.time.Instant
 import java.time.ZoneId
 import java.util.regex.Pattern
+import kotlin.reflect.KMutableProperty1
 
 class Hakibot(val client: Kord, val db: MongoDatabase) {
+    @Volatile
+    internal var huntReminders = true
 
+    @Volatile
+    internal var prayReminders = true
+
+    @Volatile
+    internal var whenActive = true
+
+    @Volatile
+    internal var triggersActive = true
 
     private val triggers = mapOf(
         "haki" to "is coding god",
@@ -70,6 +85,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         MathCommand,
         Ping,
         GithubCommand,
+        GlobalDisableCommand,
+        ViewGlobalSettings,
     )
 
     suspend fun startUp() {
@@ -202,12 +219,12 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 //        val user = getUserFromDB(mCE.message.author!!.id, mCE.message.author)
 
 
-        if (guild.settings.enableWhen && mCE.message.content.filter(Char::isLetterOrDigit).takeLast(4)
+        if (whenActive && guild.settings.enableWhen && mCE.message.content.filter(Char::isLetterOrDigit).takeLast(4)
                 .toLowerCase() == "when"
         ) {
             sendMessage(mCE.message.channel, "when", 10_000)
         }
-        if (guild.settings.enableTriggers) {
+        if (triggersActive && guild.settings.enableTriggers) {
             val triggerText = triggers[mCE.message.content.toLowerCase()]
             if (triggerText != null) {
                 mCE.message.channel.createMessage(triggerText)
@@ -227,14 +244,14 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 mCE,
                 guild,
                 mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(),
-                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+//                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
             )
         } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
             handleOWOCommand(
                 mCE,
                 guild,
                 mCE.message.content.drop(owoPre.length).trim(),
-                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+//                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
             )
         } else {
             if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
@@ -282,14 +299,21 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         return null
     }
 
-    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String, user: HakiUser) {
+    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.firstOrNull()) {
-            "hunt", "h", "catch" -> owoHuntOWOCMD(mCE, user)
-            "pray", "curse" -> owoPrayOWOCMD(mCE, split.first(), user)
+            "hunt", "h", "catch" -> if (huntReminders) owoHuntOWOCMD(
+                mCE,
+                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+            )
+            "pray", "curse" -> if (prayReminders) owoPrayOWOCMD(
+                mCE,
+                split.first(),
+                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+            )
             in owoCommands -> {
             }
-            else -> countOwO(mCE, user, guild)
+            else -> countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
     }
 
@@ -307,6 +331,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 5_000)
             }
         }
+
     }
 
     private suspend fun owoPrayOWOCMD(mCE: MessageCreateEvent, cmd: String, user: HakiUser) {
@@ -331,6 +356,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 //                resp.delete()
             }
         }
+
     }
 
     private suspend fun dmUser(user: User, message: String) {
@@ -487,6 +513,13 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         return CustomPatreon(name, stats.map { it }, als, creationInfo, timestamp, embed.thumbnail?.url)
     }
 
+    enum class DisableableFeatures(val desc: String, val property: KMutableProperty1<Hakibot, Boolean>) {
+        WHEN("When Reaction", Hakibot::whenActive),
+        TRIGGERS("Keyword Triggers", Hakibot::triggersActive),
+        HUNT_REMINDER("Hunt Reminders", Hakibot::huntReminders),
+        PRAY_REMIND("Pray/Curse Reminders", Hakibot::prayReminders),
+    }
+
     companion object {
         const val BOT_NAME = "HakiBot"
         const val HAKIBOT_SERVER = 758479736564875265
@@ -514,6 +547,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 return hour == 0
             }
         }
+
 
     }
 }

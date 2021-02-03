@@ -1,4 +1,4 @@
-package commands
+package commands.hidden
 
 import Hakibot
 import Hakibot.Companion.ONLINE_CHANNEL

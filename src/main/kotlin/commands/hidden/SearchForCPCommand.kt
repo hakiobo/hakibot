@@ -1,4 +1,4 @@
-package commands
+package commands.hidden
 
 import entities.CustomPatreon
 import Hakibot

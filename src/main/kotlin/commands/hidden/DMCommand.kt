@@ -1,4 +1,4 @@
-package commands
+package commands.hidden
 
 import Hakibot
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
