@@ -181,6 +181,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                     handleOWODexEntry(mCE, embed)
                 } catch (e: Exception) {
                     mCE.message.addReaction(ReactionEmoji.Unicode("\u274c"))
+                    println(e.message)
                     sendMessage(mCE.message.channel, "Could not parse CP stats", 10_000)
                 }
             } else if (embed?.description?.startsWith("**Name:**") == true) {
@@ -493,6 +494,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 //        println(embed.thumbnail)
 //        println(embed.url)
 //        println(embed.timestamp?.epochSecond)
+//        println(embed.description)
         val split = embed.description!!.split("`")
         val name = embed.title!!.split(" ").last()
         val base = split.lastIndex

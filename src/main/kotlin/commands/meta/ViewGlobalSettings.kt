@@ -1,9 +1,10 @@
-package commands
+package commands.meta
 
 import Hakibot
 import com.gitlab.kordlib.core.behavior.channel.createEmbed
 import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
+import commands.utils.CommandCategory
 import java.awt.Color
 
 object ViewGlobalSettings : BotCommand {
@@ -13,6 +14,9 @@ object ViewGlobalSettings : BotCommand {
         get() = listOf("globalstatus", "globalsettings", "globalinfo")
     override val description: String
         get() = "Shows the current status of hakibot's functionality"
+    override val category: CommandCategory
+        get() = CommandCategory.HAKIBOT
+
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         var numDisabled = 0
