@@ -186,27 +186,39 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 }
             } else if (embed?.description?.startsWith("**Name:**") == true) {
                 val desc = embed.description!!
-                when (embed.author?.name?.split("'s ")?.last()) {
-                    "Great Sword" -> sword(desc)
-                    "Healing Staff" -> hStaff(desc)
-                    "Bow" -> bow(desc)
-                    "Rune of the Forgotten" -> rune(desc)
-                    "Aegis" -> shield(desc)
-                    "Orb of Potency" -> orb(desc)
-                    "Vampiric Staff" -> vStaff(desc)
-                    "Poison Dagger" -> dagger(desc)
-                    "Wand of Absorption" -> wand(desc)
-                    "Flame Staff" -> fStaff(desc)
-                    "Energy Staff" -> eStaff(desc)
-                    "Spirit Staff" -> sStaff(desc)
-                    "Arcane Scepter" -> scepter(desc)
-                    "Resurrection Staff" -> rStaff(desc)
-                    "Glacial Axe" -> axe(desc)
-                    "Banner" -> banner(desc)
-                    "Culling Scythe" -> scythe(desc)
-                    else -> emptyList()
-                }.forEach {
+                val info = when (embed.author?.name?.split("'s ")?.last()) {
+                    "Great Sword" -> sword(desc) to "Sword"
+                    "Healing Staff" -> hStaff(desc) to "HStaff"
+                    "Bow" -> bow(desc) to "Bow"
+                    "Rune of the Forgotten" -> rune(desc) to "Rune"
+                    "Aegis" -> shield(desc) to "Shield"
+                    "Orb of Potency" -> orb(desc) to "Orb"
+                    "Vampiric Staff" -> vStaff(desc) to "VStaff"
+                    "Poison Dagger" -> dagger(desc) to "Dagger"
+                    "Wand of Absorption" -> wand(desc) to "Wand"
+                    "Flame Staff" -> fStaff(desc) to "FStaff"
+                    "Energy Staff" -> eStaff(desc) to "EStaff"
+                    "Spirit Staff" -> sStaff(desc) to "SStaff"
+                    "Arcane Scepter" -> scepter(desc) to "Scepter"
+                    "Resurrection Staff" -> rStaff(desc) to "RStaff"
+                    "Glacial Axe" -> axe(desc) to "Axe"
+                    "Banner" -> banner(desc) to "Banner"
+                    "Culling Scythe" -> scythe(desc) to "Scythe"
+                    else -> emptyList<ReactionEmoji>() to "nothing"
+                }
+                info.first.forEach {
                     mCE.message.addReaction(it)
+                }
+                if (info.first.firstOrNull() == ReactionEmoji.Custom(Snowflake(760023282878513161), "Fabled", true)) {
+                    val id = desc.split("\n**ID:** ").last().split("`")[1]
+                    val weaps = db.getCollection<Weapon>("weapons")
+                    if (weaps.findOne(Weapon::_id eq id) == null) {
+                        messageChannelById(FABLED_WEAP_CHANNEL, "", EmbedBuilder().apply {
+                            title = "Fabled ${info.second} Found"
+                            description = "ID: $id"
+                        })
+                        weaps.insertOne(Weapon(id, info.second))
+                    }
                 }
             }
         }
@@ -533,6 +545,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val DM_CHANNEL = 766048618364796978
         const val SUGGESTION_CHANNEL = 759695877245239297
         const val REPORT_CHANNEL = 779547975289798677
+        const val FABLED_WEAP_CHANNEL = 807512919046356993
         const val HAKIOBO_ID = 292483348738080769
         const val OWO_ID = 408785106942164992
         const val GLOBAL_PREFIX = "h!"
