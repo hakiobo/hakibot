@@ -19,6 +19,8 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import commands.*
 import commands.guild.*
+import commands.guild.DeleteOwOCount.cancelDeletion
+import commands.guild.DeleteOwOCount.confirmDeletion
 import commands.hidden.DMCommand
 import commands.hidden.GlobalDisableCommand
 import commands.hidden.LogoutCommand
@@ -30,7 +32,9 @@ import entities.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
+import java.awt.Color
 import java.lang.Exception
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.regex.Pattern
@@ -48,6 +52,9 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
     @Volatile
     internal var triggersActive = true
+
+    @Volatile
+    internal var abnormalThreshold = 10
 
     private val triggers = mapOf(
         "haki" to "is coding god",
@@ -87,14 +94,18 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         GithubCommand,
         GlobalDisableCommand,
         ViewGlobalSettings,
+        GuildStatus,
+        DisableCounting,
+        DeleteOwOCount,
     )
 
     suspend fun startUp() {
+//        db.getCollection<HakiGuild>(HakiGuild.DB_NAME).updateMany(not(HakiGuild::lastOwONormalize eq null), unset(HakiGuild::lastOwONormalize))
         client.on<ReadyEvent> {
             messageChannelById(ONLINE_CHANNEL, "Online!")
         }
         client.on<ReactionAddEvent> {
-            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.longValue == HAKIBOT_SERVER || channelId.longValue == LXV_ALERT_CHANNEL)) {
+            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.longValue == HAKIBOT_SERVER || channelId.longValue in HAKI_SHOP_REACT_CHANNELS)) {
                 val embed = getMessage().embeds.firstOrNull()
                 if (embed?.author?.name == "Today's Available Weapons") {
                     readShopWeapon(embed.description!!).forEach {
@@ -103,6 +114,24 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 }
             } else if (userId.longValue == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId) {
                 message.delete()
+            } else if (emoji in listOf(
+                    ReactionEmoji.Unicode(CHECKMARK_EMOJI),
+                    ReactionEmoji.Unicode(CROSSMARK_EMOJI)
+                ) && (this.userAsMember?.asMember()?.isOwner() == true || userId.longValue == HAKIOBO_ID)
+            ) {
+                val msg = getMessage()
+                if (msg.author?.id?.longValue == client.selfId.longValue) {
+                    val embed = msg.embeds.firstOrNull()
+                    if (embed?.author?.name == userId.value && getUserIdFromString(embed.footer!!.text) != null
+                        && embed.color?.rgb == 0x0000FF
+                    ) {
+                        if (emoji == ReactionEmoji.Unicode(CHECKMARK_EMOJI)) {
+                            confirmDeletion(msg, guildId!!)
+                        } else {
+                            cancelDeletion(msg)
+                        }
+                    }
+                }
             }
         }
         client.on<MessageCreateEvent> {
@@ -111,7 +140,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             }
         }
         client.on<MessageUpdateEvent> {
-            if (new.author?.id == OWO_ID.toString() && (this.new.guildId?.toLong() == HAKIBOT_SERVER || this.new.channelId.toLong() == LXV_ALERT_CHANNEL)) {
+            if (new.author?.id == OWO_ID.toString() && (this.new.guildId?.toLong() == HAKIBOT_SERVER || this.new.channelId.toLong() in HAKI_SHOP_REACT_CHANNELS)) {
                 if (new.embeds?.firstOrNull()?.author?.name == "Today's Available Weapons") {
                     try {
 
@@ -181,7 +210,10 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                     handleOWODexEntry(mCE, embed)
                 } catch (e: Exception) {
                     mCE.message.addReaction(ReactionEmoji.Unicode("\u274c"))
-                    println(e.message)
+                    val logEmbed = EmbedBuilder()
+                    embed.apply(logEmbed)
+                    messageChannelById(CP_FAIL_CHANNEL, "```\n${embed.description}\n```", logEmbed)
+                    println("Error Reading CP: ${e.message}")
                     sendMessage(mCE.message.channel, "Could not parse CP stats", 10_000)
                 }
             } else if (embed?.description?.startsWith("**Name:**") == true) {
@@ -291,6 +323,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     }
 
     private suspend fun handleCommand(mCE: MessageCreateEvent, msg: String) {
+        val start = Instant.now()
         val split = msg.split(Pattern.compile("\\s+"))
         val userCMD = split.first().toLowerCase()
         val args = split.drop(1)
@@ -300,6 +333,14 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             cmd.runCMD(this, mCE, args)
         } else {
             sendMessage(mCE.message.channel, "$userCMD is not a valid command", 5_000)
+        }
+        val end = Instant.now()
+        val betw = Duration.between(start, end).seconds
+        if (betw > abnormalThreshold) {
+            println("Slow Command: $userCMD")
+            println("Time: $betw seconds")
+            println("Author: ${mCE.message.author?.tag} id: ${mCE.message.author?.id}")
+            println("Message: ${mCE.message.content}")
         }
     }
 
@@ -457,8 +498,10 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
     }
 
-    fun getUserIdFromString(s: String): Long? {
-        return if (s.toLongOrNull() != null) {
+    internal fun getUserIdFromString(s: String?): Long? {
+        return if (s == null) {
+            null
+        } else if (s.toLongOrNull() != null) {
             s.toLong()
         } else if (s.startsWith("<@") && s.endsWith(">")) {
             if (s[2] == '!') {
@@ -538,10 +581,14 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val BOT_NAME = "HakiBot"
         const val HAKIBOT_SERVER = 758479736564875265
         const val LXV_SERVER = 714152739252338749
-        const val LXV_ALERT_CHANNEL = 714178162757599344
+        private const val LXV_ALERT_CHANNEL = 714178162757599344
+        private const val HNS_ANNOUNCEMENT_CHANNEL = 572201299937067019
+        private const val BXW_SHOP_CHANNEL = 766068414212210738
+        val HAKI_SHOP_REACT_CHANNELS = listOf(HNS_ANNOUNCEMENT_CHANNEL, LXV_ALERT_CHANNEL, BXW_SHOP_CHANNEL)
         const val ONLINE_CHANNEL = 761020851029803078
         const val CP_ADD_CHANNEL = 766050133430239243
         const val CP_UPD_CHANNEL = 766050160949330001
+        const val CP_FAIL_CHANNEL = 809676379020722186
         const val DM_CHANNEL = 766048618364796978
         const val SUGGESTION_CHANNEL = 759695877245239297
         const val REPORT_CHANNEL = 779547975289798677
@@ -550,8 +597,12 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         const val OWO_ID = 408785106942164992
         const val GLOBAL_PREFIX = "h!"
         const val GLOBAL_OWO_PREFIX = "owo"
+        const val SERVER_CODE = "k3XgR4s"
         val PRAY_EMOJI = ReactionEmoji.Unicode("\ud83d\ude4f")
         val CURSE_EMOJI = ReactionEmoji.Unicode("\ud83d\udc7b")
+        const val CHECKMARK_EMOJI = "\u2705"
+        const val CROSSMARK_EMOJI = "\u274c"
+
         val PST: ZoneId = ZoneId.of("PST", ZoneId.SHORT_IDS)
 
         fun isResetTime(): Boolean {
@@ -562,6 +613,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 return hour == 0
             }
         }
+
+        fun getCheckmarkOrCross(checkmark: Boolean): String = if (checkmark) CHECKMARK_EMOJI else CROSSMARK_EMOJI
 
 
     }

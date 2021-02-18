@@ -5,7 +5,10 @@ data class HakiUser(
     val username: String? = null,
     val owoSettings: OWOSettings = OWOSettings(),
     val owoCount: UserOWOCount = UserOWOCount()
-) {
+){
+    companion object {
+        const val DB_NAME = "users"
+    }
 }
 
 data class UserOWOCount(val count: Int = 0, val lastOwO: Long = 0)

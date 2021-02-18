@@ -19,7 +19,7 @@ object ServerCommand : BotCommand {
         get() = CommandCategory.HAKIBOT
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        sendMessage(mCE.message.channel, "https://discord.gg/k3XgR4s")
+        sendMessage(mCE.message.channel, "https://discord.gg/${Hakibot.SERVER_CODE}")
     }
 
 }

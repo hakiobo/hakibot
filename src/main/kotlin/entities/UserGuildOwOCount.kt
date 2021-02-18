@@ -115,6 +115,8 @@ data class UserGuildOwOCount(
 
     companion object {
         private const val OWO_CD = 10;
+        const val DB_NAME = "owo-count"
+
 
 //        fun Hakibot.normalizeGuild(mCE: MessageCreateEvent, guild: HakiGuild) {
 //            val curDate = mCE.message.id.toInstant().atZone(ZoneId.of("PST", ZoneId.SHORT_IDS)).toLocalDate()
@@ -138,6 +140,7 @@ data class UserGuildOwOCount(
 //        }
 
         fun Hakibot.countOwO(mCE: MessageCreateEvent, user: HakiUser, guild: HakiGuild) {
+            if(!guild.settings.owoCountingEnabled) return
             val newInstant = mCE.message.id.toInstant()
             if (Duration.between(Instant.ofEpochMilli(user.owoCount.lastOwO), newInstant).seconds < OWO_CD) return
             val col = db.getCollection<UserGuildOwOCount>("owo-count")
@@ -161,6 +164,7 @@ data class UserGuildOwOCount(
             col.updateOne(UserGuildOwOCount::_id eq entry._id, entry, UpdateOptions().upsert(true))
         }
     }
+
 }
 
 val owoCommands = hashSetOf(

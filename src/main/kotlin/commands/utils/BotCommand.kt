@@ -22,20 +22,23 @@ interface BotCommand {
 }
 
 data class CommandUsage(
-        val args: List<Argument>,
-        val description: String,
-        val accessType: AccessType = AccessType.EVERYONE
+    val args: List<Argument>,
+    val description: String,
+    val accessType: AccessType = AccessType.EVERYONE
 ) {
 }
 
 enum class AccessType(val desc: String) {
-    EVERYONE("Anyone"), ADMIN("Server Admin"), HAKI("Hakiobo")
+    EVERYONE("Anyone"),
+    ADMIN("Server Admin"),
+    HAKI("Hakiobo"),
+    OWNER("Server Owner"),
 }
 
 data class Argument(val text: String, val argType: ArgumentType = ArgumentType.PARAMETER) {
     constructor(args: List<String>, choiceType: ChoiceType = ChoiceType.EXACT) : this(
-            args.joinToString("|"),
-            choiceType.argType
+        args.joinToString("|"),
+        choiceType.argType
     )
 }
 
@@ -45,7 +48,7 @@ enum class ChoiceType(val argType: ArgumentType) {
 
 enum class ArgumentType(val prefix: String, val suffix: String) {
     FLAG("-", ""),
-    FLAG_PARAM("-<",">"),
+    FLAG_PARAM("-<", ">"),
     EXACT("", ""),
     PARAMETER("<", ">"),
     TEXT("{", "}"),

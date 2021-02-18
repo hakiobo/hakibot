@@ -205,9 +205,11 @@ object CPCommand : BotCommand {
                         mCE.message.channel.createMessage("Found no cps with those stats")
                     } else {
                         val sbMessage = StringBuilder("Cps matching query: ${query.count()}\n")
-                        query.forEach { cp ->
+                        for(cp in query){
                             sbMessage.append("    ").append(cp.name).append("\n")
+                            if(sbMessage.length > 2000) break
                         }
+
                         if (sbMessage.length > 2000) {
                             mCE.message.channel.createMessage("${query.count()} Cps. Result too long to fit in single message. I'll eventually add pagination")
                         } else {

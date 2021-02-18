@@ -28,11 +28,11 @@ object ViewGlobalSettings : BotCommand {
                 field {
                     name = feature.desc
                     value = if (feature.property.get(this@cmd)) {
-                        "Enabled \u2705"
+                        "Enabled "
                     } else {
                         numDisabled++
-                        "Disabled \u274c"
-                    }
+                        "Disabled "
+                    } + Hakibot.getCheckmarkOrCross(feature.property.get(this@cmd))
                 }
             }
             color = Color((numDisabled * 255) / features.size, 255 - (numDisabled * 255) / features.size, 0)
