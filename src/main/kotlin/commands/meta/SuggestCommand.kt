@@ -2,10 +2,10 @@ package commands.meta
 
 import Hakibot
 import Hakibot.Companion.SUGGESTION_CHANNEL
-import com.gitlab.kordlib.core.entity.ReactionEmoji
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import commands.utils.*
+import dev.kord.core.entity.ReactionEmoji
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.rest.builder.message.EmbedBuilder
 
 
 object SuggestCommand : BotCommand {
@@ -24,10 +24,10 @@ object SuggestCommand : BotCommand {
 
     override val usages: List<CommandUsage>
         get() = listOf(
-                CommandUsage(
-                        listOf(Argument("suggestion", ArgumentType.TEXT)),
-                        "Sends your suggestion to Hakibot dev"
-                )
+            CommandUsage(
+                listOf(Argument("suggestion", ArgumentType.TEXT)),
+                "Sends your suggestion to Hakibot dev"
+            )
         )
 
     override val category: CommandCategory
@@ -41,6 +41,9 @@ object SuggestCommand : BotCommand {
                 author {
                     name = "${mCE.message.author?.tag ?: "Nobody"}'s Suggestion"
                     icon = mCE.message.author?.avatar?.url
+                }
+                footer {
+                    text = mCE.message.author!!.id.asString
                 }
             }
             val msg = messageChannelById(SUGGESTION_CHANNEL, "", embed)

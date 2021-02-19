@@ -11,11 +11,11 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     jcenter()
-    maven(url = "https://dl.bintray.com/kordlib/Kord")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 dependencies {
     testImplementation(kotlin("test-testng"))
-    implementation("com.gitlab.kordlib.kord:kord-core:0.6.6")
+    implementation("dev.kord:kord-core:0.7.0-SNAPSHOT")
     implementation("org.mongodb:mongodb-driver-sync:4.1.0")
     implementation("org.litote.kmongo:kmongo:4.1.2")
     implementation("org.slf4j:slf4j-simple:1.7.30")

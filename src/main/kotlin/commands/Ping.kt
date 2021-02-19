@@ -1,10 +1,10 @@
 package commands
 
 import Hakibot
-import com.gitlab.kordlib.core.behavior.edit
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandUsage
+import dev.kord.core.behavior.edit
+import dev.kord.core.event.message.MessageCreateEvent
 import toInstant
 import java.time.Duration
 import java.time.Instant

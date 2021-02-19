@@ -1,9 +1,9 @@
 package commands.meta
 
 import Hakibot
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import dev.kord.core.event.message.MessageCreateEvent
 
 object GithubCommand : BotCommand {
     override val name: String

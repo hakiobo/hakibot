@@ -1,20 +1,4 @@
 import entities.UserGuildOwOCount.Companion.countOwO
-import com.gitlab.kordlib.common.entity.DiscordMessage
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.Kord
-import com.gitlab.kordlib.core.behavior.MessageBehavior
-import com.gitlab.kordlib.core.behavior.channel.MessageChannelBehavior
-import com.gitlab.kordlib.core.entity.Embed
-import com.gitlab.kordlib.core.entity.ReactionEmoji
-import com.gitlab.kordlib.core.entity.User
-import com.gitlab.kordlib.core.event.gateway.ReadyEvent
-import com.gitlab.kordlib.core.event.guild.GuildCreateEvent
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import com.gitlab.kordlib.core.event.message.MessageUpdateEvent
-import com.gitlab.kordlib.core.event.message.ReactionAddEvent
-import com.gitlab.kordlib.core.on
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
-import com.gitlab.kordlib.rest.request.RestRequestException
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import commands.*
@@ -28,11 +12,26 @@ import commands.hidden.SearchForCPCommand
 import commands.meta.*
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import dev.kord.common.entity.DiscordMessage
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.Kord
+import dev.kord.core.behavior.MessageBehavior
+import dev.kord.core.behavior.channel.MessageChannelBehavior
+import dev.kord.core.entity.Embed
+import dev.kord.core.entity.ReactionEmoji
+import dev.kord.core.entity.User
+import dev.kord.core.event.gateway.ReadyEvent
+import dev.kord.core.event.guild.GuildCreateEvent
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.core.event.message.MessageUpdateEvent
+import dev.kord.core.event.message.ReactionAddEvent
+import dev.kord.core.on
+import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kord.rest.request.RestRequestException
 import entities.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
-import java.awt.Color
 import java.lang.Exception
 import java.time.Duration
 import java.time.Instant
@@ -105,24 +104,24 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             messageChannelById(ONLINE_CHANNEL, "Online!")
         }
         client.on<ReactionAddEvent> {
-            if (userId.longValue == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.longValue == HAKIBOT_SERVER || channelId.longValue in HAKI_SHOP_REACT_CHANNELS)) {
+            if (userId.value == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.value == HAKIBOT_SERVER || channelId.value in HAKI_SHOP_REACT_CHANNELS)) {
                 val embed = getMessage().embeds.firstOrNull()
                 if (embed?.author?.name == "Today's Available Weapons") {
                     readShopWeapon(embed.description!!).forEach {
                         message.addReaction(it)
                     }
                 }
-            } else if (userId.longValue == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId) {
+            } else if (userId.value == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId) {
                 message.delete()
             } else if (emoji in listOf(
                     ReactionEmoji.Unicode(CHECKMARK_EMOJI),
                     ReactionEmoji.Unicode(CROSSMARK_EMOJI)
-                ) && (this.userAsMember?.asMember()?.isOwner() == true || userId.longValue == HAKIOBO_ID)
+                ) && (this.userAsMember?.asMember()?.isOwner() == true || userId.value == HAKIOBO_ID)
             ) {
                 val msg = getMessage()
-                if (msg.author?.id?.longValue == client.selfId.longValue) {
+                if (msg.author?.id?.value == client.selfId.value) {
                     val embed = msg.embeds.firstOrNull()
-                    if (embed?.author?.name == userId.value && getUserIdFromString(embed.footer!!.text) != null
+                    if (embed?.author?.name == userId.asString && getUserIdFromString(embed.footer!!.text) != null
                         && embed.color?.rgb == 0x0000FF
                     ) {
                         if (emoji == ReactionEmoji.Unicode(CHECKMARK_EMOJI)) {
@@ -140,12 +139,13 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             }
         }
         client.on<MessageUpdateEvent> {
-            if (new.author?.id == OWO_ID.toString() && (this.new.guildId?.toLong() == HAKIBOT_SERVER || this.new.channelId.toLong() in HAKI_SHOP_REACT_CHANNELS)) {
-                if (new.embeds?.firstOrNull()?.author?.name == "Today's Available Weapons") {
+            if (new.author.value?.id?.value == OWO_ID && (this.new.guildId.value?.value == HAKIBOT_SERVER || this.new.channelId.value in HAKI_SHOP_REACT_CHANNELS)) {
+                if (new.embeds.value?.firstOrNull()?.author?.value?.name?.value == "Today's Available Weapons") {
                     try {
+                        val embed = new.embeds.value!!.first()
 
                         val oldR = getMessage().reactions.filter { it.selfReacted }.map { it.emoji }
-                        val newR = readShopWeapon(new.embeds?.first()?.description!!)
+                        val newR = readShopWeapon(embed.description.value!!)
 
                         oldR.forEach {
                             message.deleteOwnReaction(it)
@@ -161,8 +161,8 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
         client.on<GuildCreateEvent> {
             val col = db.getCollection<HakiGuild>("guilds")
-            if (col.findOne(HakiGuild::_id eq guild.id.value) == null) {
-                col.insertOne(HakiGuild(guild.id.value))
+            if (col.findOne(HakiGuild::_id eq guild.id.asString) == null) {
+                col.insertOne(HakiGuild(guild.id.asString))
             }
         }
 
@@ -177,12 +177,12 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         u: User? = null,
         col: MongoCollection<HakiUser> = db.getCollection<HakiUser>("users")
     ): HakiUser {
-        val query = col.findOne(HakiUser::_id eq userID.value)
+        val query = col.findOne(HakiUser::_id eq userID.asString)
         return if (query == null) {
             val user = if (u == null) {
-                HakiUser(userID.value, client.getUser(userID)?.username ?: "Deleted User#${userID.value}")
+                HakiUser(userID.asString, client.getUser(userID)?.username ?: "Deleted User#${userID.value}")
             } else {
-                HakiUser(userID.value, u.username)
+                HakiUser(userID.asString, u.username)
             }
             col.insertOne(user)
             user
@@ -203,7 +203,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     private suspend fun handleMessage(mCE: MessageCreateEvent) {
         if (mCE.message.author?.id == client.selfId) return
         if (mCE.message.author == null) return
-        if (mCE.message.author?.id?.longValue == OWO_ID) {
+        if (mCE.message.author?.id?.value == OWO_ID) {
             val embed = mCE.message.embeds.firstOrNull()
             if (embed?.description?.startsWith("*Created by*") == true) {
                 try {
@@ -319,7 +319,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         guild: Snowflake,
         col: MongoCollection<HakiGuild> = db.getCollection<HakiGuild>("guilds")
     ): HakiGuild {
-        return col.findOne(HakiGuild::_id eq guild.value) ?: HakiGuild(guild.value)
+        return col.findOne(HakiGuild::_id eq guild.asString) ?: HakiGuild(guild.asString)
     }
 
     private suspend fun handleCommand(mCE: MessageCreateEvent, msg: String) {
@@ -377,7 +377,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val time = mCE.message.id.toInstant().toEpochMilli()
         if (user.owoSettings.huntRemind && (time - user.owoSettings.lastHunt) >= 15 * 1000) {
             col.updateOne(
-                HakiUser::_id eq authorID.value,
+                HakiUser::_id eq authorID.asString,
                 setValue(HakiUser::owoSettings / OWOSettings::lastHunt, time)
             )
             client.launch {
@@ -394,7 +394,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val time = mCE.message.id.toInstant().toEpochMilli()
         if (user.owoSettings.prayRemind && (time - user.owoSettings.lastPray) >= 5 * 60 * 1000) {
             col.updateOne(
-                HakiUser::_id eq authorID.value,
+                HakiUser::_id eq authorID.asString,
                 setValue(HakiUser::owoSettings / OWOSettings::lastPray, time)
             )
             if (cmd.startsWith("p")) {
@@ -417,13 +417,13 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val channel = try {
             user.getDmChannel()
         } catch (exception: RestRequestException) {
-            if (user.id.longValue != HAKIOBO_ID) dmUser(HAKIOBO_ID, "Failed to get ${user.tag}'s DM's")
+            if (user.id.value != HAKIOBO_ID) dmUser(HAKIOBO_ID, "Failed to get ${user.tag}'s DM's")
             return
         }
         try {
             channel.createMessage(message)
         } catch (exception: RestRequestException) {
-            if (user.id.longValue != HAKIOBO_ID) dmUser(HAKIOBO_ID, "Failed to send DM to ${user.tag}")
+            if (user.id.value != HAKIOBO_ID) dmUser(HAKIOBO_ID, "Failed to send DM to ${user.tag}")
 
         }
     }
@@ -451,7 +451,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 description = mCE.message.content
                 if (mCE.message.author != null) {
                     footer {
-                        text = mCE.message.author!!.id.value
+                        text = mCE.message.author!!.id.asString
                     }
                 }
 
@@ -492,9 +492,9 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         message: String,
         embed: EmbedBuilder? = null
     ): DiscordMessage {
-        return client.rest.channel.createMessage(channelId.toString()) {
-            content = message
+        return client.rest.channel.createMessage(Snowflake(channelId)) {
             this.embed = embed
+            this.content = message
         }
     }
 
@@ -566,7 +566,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 .map { it.trim() }.filter { it != "None" }
         val date = embed.description!!.split("\n*for being ")[1].split(" ").take(3).drop(1)
         val creationInfo = CreationInfo(CreationInfo.getMonthNum(date.first())!!, date.last().toInt())
-        val timestamp = message.id.longValue ushr 22
+        val timestamp = message.id.value ushr 22
         return CustomPatreon(name, stats.map { it }, als, creationInfo, timestamp, embed.thumbnail?.url)
     }
 
@@ -620,4 +620,4 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     }
 }
 
-fun Snowflake.toInstant(): Instant = Instant.ofEpochMilli((longValue ushr 22) + 1420070400000L)
+fun Snowflake.toInstant(): Instant = Instant.ofEpochMilli((value ushr 22) + 1420070400000L)

@@ -1,10 +1,10 @@
 package commands.meta
 
 import Hakibot
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
-import java.awt.Color
+import dev.kord.common.Color
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.event.message.MessageCreateEvent
 import java.util.*
 
 object HelpCommand : BotCommand {
@@ -43,7 +43,7 @@ object HelpCommand : BotCommand {
 //                helpMSG.append("```")
                 mCE.message.channel.createEmbed {
                     title = "${Hakibot.BOT_NAME} Available Commands"
-                    color = Color.GREEN
+                    color = Color(0x00FF00)
                     footer {
                         icon = "https://cdn.discordapp.com/emojis/770777353956753419.png"
                         text = "h!help <cmd> for more information about a specific command"

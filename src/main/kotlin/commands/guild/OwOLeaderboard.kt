@@ -2,15 +2,15 @@ package commands.guild
 
 import Hakibot
 import entities.UserGuildOwOCount
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import dev.kord.common.Color
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.event.message.MessageCreateEvent
 import entities.HakiUser
 import org.litote.kmongo.*
 import toInstant
-import java.awt.Color
 import java.time.Duration
 import java.time.Instant
 import kotlin.reflect.KProperty1
@@ -206,7 +206,7 @@ object OwOLeaderboard : BotCommand {
         size: Int,
     ): List<Pair<Long, Int>> {
         return bot.db.getCollection<UserGuildOwOCount>("owo-count").aggregate<UserGuildOwOCount>(
-            match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
+            match(UserGuildOwOCount::guild eq mCE.guildId!!.value),
             sort(descending(unit.curStat)),
             limit(size)
         ).toList().map { Pair(it.user, unit.curStat.get(it)) }
@@ -219,7 +219,7 @@ object OwOLeaderboard : BotCommand {
         size: Int,
     ): List<Pair<Long, Int>> {
         return bot.db.getCollection<UserGuildOwOCount>("owo-count").aggregate<UserGuildOwOCount>(
-            match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
+            match(UserGuildOwOCount::guild eq mCE.guildId!!.value),
             match(UserGuildOwOCount::lastOWO gte unit.start(mCE.message.id).toEpochMilli()),
             sort(descending(unit.curStat)),
             limit(size)
@@ -236,14 +236,14 @@ object OwOLeaderboard : BotCommand {
         val prevStart = unit.prevStart(mCE.message.id).toEpochMilli()
         val col = bot.db.getCollection<UserGuildOwOCount>("owo-count")
         return col.aggregate<UserGuildOwOCount>(
-            match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
+            match(UserGuildOwOCount::guild eq mCE.guildId!!.value),
             match(UserGuildOwOCount::lastOWO gte start),
             sort(descending(unit.prevStat)),
             limit(size)
         ).toList().map { Pair(it.user, unit.prevStat.get(it)) }
             .union(
                 col.aggregate<UserGuildOwOCount>(
-                    match(UserGuildOwOCount::guild eq mCE.guildId!!.longValue),
+                    match(UserGuildOwOCount::guild eq mCE.guildId!!.value),
                     match(UserGuildOwOCount::lastOWO gte prevStart),
                     match(UserGuildOwOCount::lastOWO lt start),
                     sort(descending(unit.curStat)),

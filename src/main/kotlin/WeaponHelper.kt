@@ -1,6 +1,5 @@
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.entity.Embed
-import com.gitlab.kordlib.core.entity.ReactionEmoji
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.entity.ReactionEmoji
 import java.util.regex.Pattern
 
 val qualityEmojis = listOf(

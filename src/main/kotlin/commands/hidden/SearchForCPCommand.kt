@@ -2,14 +2,13 @@ package commands.hidden
 
 import entities.CustomPatreon
 import Hakibot
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.behavior.channel.GuildMessageChannelBehavior
-import com.gitlab.kordlib.core.behavior.channel.MessageChannelBehavior
-import com.gitlab.kordlib.core.entity.Message
-
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import com.mongodb.client.MongoCollection
 import commands.utils.*
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.channel.GuildMessageChannelBehavior
+import dev.kord.core.behavior.channel.MessageChannelBehavior
+import dev.kord.core.entity.Message
+import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.flow.collect
 import org.litote.kmongo.*
 
@@ -33,7 +32,7 @@ object SearchForCPCommand : BotCommand {
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        if (mCE.message.author?.id?.longValue == Hakibot.HAKIOBO_ID) {
+        if (mCE.message.author?.id?.value == Hakibot.HAKIOBO_ID) {
 
             if (args.size == 1) {
                 val guild = mCE.getGuild()!!
@@ -105,11 +104,11 @@ object SearchForCPCommand : BotCommand {
     }
 
     private suspend fun Hakibot.parseMessage(
-            message: Message,
-            col: MongoCollection<CustomPatreon>,
-            srcChannel: MessageChannelBehavior
+        message: Message,
+        col: MongoCollection<CustomPatreon>,
+        srcChannel: MessageChannelBehavior
     ): Int {
-        if (message.author?.id?.longValue == Hakibot.OWO_ID) {
+        if (message.author?.id?.value == Hakibot.OWO_ID) {
             val embed = message.embeds.firstOrNull()
             if (embed?.description?.startsWith("*Created by*") == true) {
                 try {

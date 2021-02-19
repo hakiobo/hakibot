@@ -1,7 +1,7 @@
 package commands.utils
 
 import Hakibot
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
+import dev.kord.core.event.message.MessageCreateEvent
 
 interface BotCommand {
     val name: String

@@ -1,11 +1,11 @@
 package commands
 
 import Hakibot
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.Argument
 import commands.utils.ArgumentType
 import commands.utils.BotCommand
 import commands.utils.CommandUsage
+import dev.kord.core.event.message.MessageCreateEvent
 import math.evaluate
 import kotlin.math.E
 import kotlin.math.PI

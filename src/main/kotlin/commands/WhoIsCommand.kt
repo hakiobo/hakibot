@@ -2,10 +2,10 @@ package commands
 
 import commands.utils.BotCommand
 import Hakibot
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.Argument
 import commands.utils.CommandUsage
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.event.message.MessageCreateEvent
 
 object WhoIsCommand : BotCommand {
 

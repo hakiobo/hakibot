@@ -3,10 +3,10 @@ package commands
 import entities.CreationInfo
 import entities.CustomPatreon
 import Hakibot
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import com.mongodb.client.MongoCollection
 import commands.utils.*
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.event.message.MessageCreateEvent
 import math.count
 import org.bson.conversions.Bson
 import org.litote.kmongo.*
@@ -70,7 +70,7 @@ object CPCommand : BotCommand {
         val author = mCE.message.author!!
         when (val cmd = args.first().toLowerCase()) {
             "add", "a" -> {
-                if (author.id.longValue in getCPAdders()) {
+                if (author.id.value in getCPAdders()) {
                     if (args.size != 8) {
                         mCE.message.channel.createMessage("wrong format for adding cp, expecting `h! cp $cmd <name> <hp> <str> <pr> <wp> <mag> <mr>`")
                         return
@@ -132,7 +132,7 @@ object CPCommand : BotCommand {
             }
 
             "delete", "del" -> {
-                if (mCE.message.author?.id?.longValue == Hakibot.HAKIOBO_ID) {
+                if (mCE.message.author?.id?.value == Hakibot.HAKIOBO_ID) {
                     if (args.size != 2) {
                         mCE.message.channel.createMessage("wrong format for deleting cp entry, expecting `h!cp $cmd <name>`")
                     } else {
@@ -182,7 +182,7 @@ object CPCommand : BotCommand {
                             } else {
                                 val low = a.toIntOrNull()
                                 val high = b.toIntOrNull()
-                                if(low == null || high == null || high <= low){
+                                if (low == null || high == null || high <= low) {
                                     badFormat()
                                     return
                                 }
@@ -205,9 +205,9 @@ object CPCommand : BotCommand {
                         mCE.message.channel.createMessage("Found no cps with those stats")
                     } else {
                         val sbMessage = StringBuilder("Cps matching query: ${query.count()}\n")
-                        for(cp in query){
+                        for (cp in query) {
                             sbMessage.append("    ").append(cp.name).append("\n")
-                            if(sbMessage.length > 2000) break
+                            if (sbMessage.length > 2000) break
                         }
 
                         if (sbMessage.length > 2000) {

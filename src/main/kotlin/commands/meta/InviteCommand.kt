@@ -1,13 +1,9 @@
 package commands.meta
-
 import commands.utils.BotCommand
 import Hakibot
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import commands.utils.AccessType
 import commands.utils.CommandCategory
 import commands.utils.CommandUsage
-import java.awt.Color
+import dev.kord.core.event.message.MessageCreateEvent
 
 object InviteCommand : BotCommand {
     override val name: String

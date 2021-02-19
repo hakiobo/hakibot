@@ -1,11 +1,11 @@
 package commands.meta
 
 import Hakibot
-import com.gitlab.kordlib.core.entity.Guild
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
 import commands.utils.CommandUsage
+import dev.kord.core.entity.Guild
+import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 

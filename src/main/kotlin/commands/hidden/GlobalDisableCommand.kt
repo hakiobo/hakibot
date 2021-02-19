@@ -1,9 +1,8 @@
 package commands.hidden
 
 import Hakibot
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
-import kotlin.reflect.KMutableProperty1
+import dev.kord.core.event.message.MessageCreateEvent
 
 object GlobalDisableCommand : BotCommand {
 
@@ -32,7 +31,7 @@ object GlobalDisableCommand : BotCommand {
         get() = CommandCategory.HIDDEN
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        if (mCE.message.author?.id?.longValue == Hakibot.HAKIOBO_ID) {
+        if (mCE.message.author?.id?.value == Hakibot.HAKIOBO_ID) {
             if (args.isEmpty()) {
                 sendMessage(mCE.message.channel, "Invalid Syntax!", 5_000)
             } else {

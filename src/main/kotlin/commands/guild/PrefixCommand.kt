@@ -2,9 +2,9 @@ package commands.guild
 
 import entities.HakiGuild
 import Hakibot
-import com.gitlab.kordlib.common.entity.Permission
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
+import dev.kord.common.entity.Permission
+import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollection
 import org.litote.kmongo.setValue
@@ -34,12 +34,12 @@ object PrefixCommand : BotCommand {
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        val guildID = mCE.guildId!!.value
+        val guildID = mCE.guildId!!.asString
         when (args.size) {
             0 -> mCE.message.channel.createMessage("Current prefix is ${getGuildInfo(mCE.guildId!!).prefix}")
             1 -> {
                 if (mCE.member?.getPermissions()
-                        ?.contains(Permission.Administrator) == true || mCE.member?.id?.longValue == Hakibot.HAKIOBO_ID
+                        ?.contains(Permission.Administrator) == true || mCE.member?.id?.value == Hakibot.HAKIOBO_ID
                 ) {
                     val col = db.getCollection<HakiGuild>("guilds")
                     val prefix = args.first().toLowerCase()

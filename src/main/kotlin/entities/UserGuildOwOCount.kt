@@ -1,8 +1,8 @@
 package entities
 
 import Hakibot
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import com.mongodb.client.model.UpdateOptions
+import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.*
 import toInstant
 import java.time.Duration

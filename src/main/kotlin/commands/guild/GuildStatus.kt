@@ -1,10 +1,10 @@
 package commands.guild
 
 import Hakibot
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.event.message.MessageCreateEvent
 import entities.HakiGuild
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
@@ -37,7 +37,7 @@ object GuildStatus : BotCommand {
         get() = CommandCategory.GUILD
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        val guild = db.getCollection<HakiGuild>(HakiGuild.DB_NAME).findOne(HakiGuild::_id eq mCE.guildId!!.value)
+        val guild = db.getCollection<HakiGuild>(HakiGuild.DB_NAME).findOne(HakiGuild::_id eq mCE.guildId!!.asString)
         if (guild == null) {
             sendMessage(mCE.message.channel, "no data found for this server somehow. sad", 5_000)
         } else {

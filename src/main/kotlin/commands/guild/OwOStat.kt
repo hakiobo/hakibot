@@ -2,15 +2,15 @@ package commands.guild
 
 import Hakibot
 import entities.UserGuildOwOCount
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
+import dev.kord.common.Color
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import toInstant
-import java.awt.Color
 
 object OwOStat : BotCommand {
     override val name: String
@@ -36,7 +36,7 @@ object OwOStat : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         when (args.size) {
             0 -> {
-                displayOwOStats(mCE, mCE.member!!.id.longValue)
+                displayOwOStats(mCE, mCE.member!!.id.value)
             }
             1 -> {
                 val userId = getUserIdFromString(args.first())

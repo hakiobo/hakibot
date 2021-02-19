@@ -1,11 +1,11 @@
 package commands.meta
 
 import Hakibot
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
-import java.awt.Color
+import dev.kord.common.Color
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.event.message.MessageCreateEvent
 
 object ViewGlobalSettings : BotCommand {
     override val name: String
@@ -22,7 +22,6 @@ object ViewGlobalSettings : BotCommand {
         var numDisabled = 0
         val features = Hakibot.DisableableFeatures.values()
         mCE.message.channel.createEmbed {
-
             title = "${Hakibot.BOT_NAME} Status"
             for (feature in features) {
                 field {

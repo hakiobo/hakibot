@@ -2,10 +2,10 @@ package commands.meta
 
 import Hakibot
 import Hakibot.Companion.REPORT_CHANNEL
-import com.gitlab.kordlib.core.entity.ReactionEmoji
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
 import commands.utils.*
+import dev.kord.core.entity.ReactionEmoji
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.rest.builder.message.EmbedBuilder
 
 object ReportCommand : BotCommand {
     override val name: String
@@ -29,6 +29,9 @@ object ReportCommand : BotCommand {
                 author {
                     name = "Report from ${mCE.message.author?.tag ?: "Nobody"}"
                     icon = mCE.message.author?.avatar?.url
+                }
+                footer {
+                    text = mCE.message.author!!.id.asString
                 }
             }
 

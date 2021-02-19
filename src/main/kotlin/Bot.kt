@@ -1,8 +1,7 @@
-import com.gitlab.kordlib.core.Kord
-
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.WriteConcern
+import dev.kord.core.Kord
 import org.litote.kmongo.*
 
 val MONGO_CONNECT_URI =

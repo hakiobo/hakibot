@@ -1,8 +1,8 @@
 package entities
 
-import com.gitlab.kordlib.rest.builder.message.EmbedBuilder
+import dev.kord.common.Color
+import dev.kord.rest.builder.message.EmbedBuilder
 import org.bson.codecs.pojo.annotations.BsonId
-import java.awt.Color
 import kotlin.random.Random
 
 data class CustomPatreon(

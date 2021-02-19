@@ -1,20 +1,21 @@
 package commands.guild
 
 import Hakibot
-import com.gitlab.kordlib.common.entity.Snowflake
-import com.gitlab.kordlib.core.behavior.channel.createEmbed
-import com.gitlab.kordlib.core.behavior.edit
-import com.gitlab.kordlib.core.entity.Message
-import com.gitlab.kordlib.core.entity.ReactionEmoji
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.*
+import dev.kord.common.Color
+import dev.kord.common.entity.Snowflake
+import dev.kord.common.entity.optional.value
+import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.behavior.edit
+import dev.kord.core.entity.Message
+import dev.kord.core.entity.ReactionEmoji
+import dev.kord.core.event.message.MessageCreateEvent
 import entities.HakiUser
 import entities.UserGuildOwOCount
 import kotlinx.coroutines.delay
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
-import java.awt.Color
 
 object DeleteOwOCount : BotCommand {
     override val name: String
@@ -35,7 +36,7 @@ object DeleteOwOCount : BotCommand {
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        if (mCE.member!!.isOwner() || mCE.message.author!!.id.longValue == Hakibot.HAKIOBO_ID) {
+        if (mCE.member!!.isOwner() || mCE.message.author!!.id.value == Hakibot.HAKIOBO_ID) {
             if (args.size == 1) {
                 val id = getUserIdFromString(args.first())
                 if (id != null) {
@@ -50,7 +51,7 @@ object DeleteOwOCount : BotCommand {
                                 text = id.toString()
                             }
                             author {
-                                name = mCE.message.author!!.id.value
+                                name = mCE.message.author!!.id.asString
                             }
                             color = Color(0x0000FF)
                         }
@@ -59,9 +60,9 @@ object DeleteOwOCount : BotCommand {
                         }
                         delay(30_000)
                         if (client.rest.channel.getMessage(
-                                mCE.message.channelId.value,
-                                msg.id.value
-                            ).embeds.firstOrNull()?.color == 0x0000FF
+                                Snowflake(mCE.message.channelId.value),
+                                Snowflake(msg.id.value)
+                            ).embeds.firstOrNull()?.color.value == 0x0000FF
                         ) {
                             msg.edit {
                                 embed {

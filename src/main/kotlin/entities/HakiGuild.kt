@@ -5,7 +5,6 @@ data class HakiGuild(
     val prefix: String = "h!",
     val owoPrefix: String = "owo",
     val settings: Settings = Settings(),
-//    val lastOwONormalize: Long? = null,
 ) {
     companion object {
         const val DB_NAME = "guilds"

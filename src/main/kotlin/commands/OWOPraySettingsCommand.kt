@@ -4,10 +4,10 @@ import commands.utils.BotCommand
 import Hakibot
 import entities.HakiUser
 import entities.OWOSettings
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.Argument
 import commands.utils.CommandCategory
 import commands.utils.CommandUsage
+import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollection

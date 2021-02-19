@@ -3,10 +3,10 @@ package commands.guild
 import entities.HakiGuild
 import Hakibot
 import entities.Settings
-import com.gitlab.kordlib.common.entity.Permission
-import com.gitlab.kordlib.core.event.message.MessageCreateEvent
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import dev.kord.common.entity.Permission
+import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.getCollection
@@ -29,7 +29,7 @@ interface SettingsCommand : BotCommand {
             }
             1 -> {
                 if (mCE.member!!.getPermissions()
-                        .contains(Permission.Administrator) || mCE.member!!.id.longValue == Hakibot.HAKIOBO_ID
+                        .contains(Permission.Administrator) || mCE.member!!.id.value == Hakibot.HAKIOBO_ID
                 ) {
                     when (args.first().toLowerCase()) {
                         "true" -> {
