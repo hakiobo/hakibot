@@ -33,7 +33,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
 import java.lang.Exception
-import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.util.regex.Pattern
@@ -100,7 +99,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
     suspend fun startUp() {
         client.on<ReadyEvent> {
-            messageChannelById(ONLINE_CHANNEL, "Online!")
+            messageChannelById(ONLINE_CHANNEL, "Online! (${this.shard})")
         }
         client.on<ReactionAddEvent> {
             if (userId.value == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.value == HAKIBOT_SERVER || channelId.value in HAKI_SHOP_REACT_CHANNELS)) {
@@ -164,7 +163,6 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
                 col.insertOne(HakiGuild(guild.id.asString))
             }
         }
-
         client.login {
             since = Instant.now().minusSeconds(60 * 60 * 8)!!
             playing("h!help")
