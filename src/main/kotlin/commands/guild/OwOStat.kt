@@ -5,7 +5,6 @@ import entities.UserGuildOwOCount
 import commands.utils.*
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
@@ -61,8 +60,9 @@ object OwOStat : BotCommand {
             val now = mCE.message.id.toInstant().atZone(Hakibot.PST)
             query.normalize(mCE)
             val username = getUserFromDB(Snowflake(query.user)).username!!
-            mCE.message.channel.createEmbed {
-                title = "$username's OwOs in ${mCE.getGuild()!!.name}"
+            val guildName = mCE.getGuild()!!.name
+            sendMessage(mCE.message.channel) {
+                title = "$username's OwOs in $guildName"
                 description = "__**Total**__: ${query.owoCount}\n"
                 field {
                     name = "Current Stats"
@@ -75,7 +75,9 @@ object OwOStat : BotCommand {
                     name = "Past Stats"
                     value = "__Yesterday__: ${query.yesterdayCount}\n" +
                             "__Last Week__: ${query.lastWeekCount}\n" +
-                            "__${now.minusMonths(1).month.name.toLowerCase().capitalize()}__: ${query.lastMonthCount}\n" +
+                            "__${
+                                now.minusMonths(1).month.name.toLowerCase().capitalize()
+                            }__: ${query.lastMonthCount}\n" +
                             "__${now.year - 1}__: ${query.lastYearCount}"
                 }
                 color = Color(0xABCDEF)

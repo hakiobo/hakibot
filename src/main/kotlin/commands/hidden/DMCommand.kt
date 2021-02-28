@@ -31,12 +31,10 @@ object DMCommand : BotCommand {
             if (userID != null) {
                 dmUser(userID, args.drop(1).joinToString(" "))
             } else {
-                mCE.message.channel.createMessage("That's not a userID")
+                sendMessage(mCE.message.channel, "That's not a userID")
             }
         } else {
-            mCE.message.channel.createMessage("Only Haki can use the DM command")
+            sendMessage(mCE.message.channel, "Only Haki can use the DM command")
         }
     }
-
-
 }

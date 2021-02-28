@@ -36,7 +36,7 @@ object PrefixCommand : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         val guildID = mCE.guildId!!.asString
         when (args.size) {
-            0 -> mCE.message.channel.createMessage("Current prefix is ${getGuildInfo(mCE.guildId!!).prefix}")
+            0 -> sendMessage(mCE.message.channel, "Current prefix is ${getGuildInfo(mCE.guildId!!).prefix}")
             1 -> {
                 if (mCE.member?.getPermissions()
                         ?.contains(Permission.Administrator) == true || mCE.member?.id?.value == Hakibot.HAKIOBO_ID
@@ -48,12 +48,12 @@ object PrefixCommand : BotCommand {
 //                    } else {
                     col.updateOne(HakiGuild::_id eq guildID, setValue(HakiGuild::prefix, prefix))
 //                    }
-                    mCE.message.channel.createMessage("prefix changed to $prefix")
+                    sendMessage(mCE.message.channel, "prefix changed to $prefix")
                 } else {
-                    mCE.message.channel.createMessage("Only servers admins can change the prefix")
+                    sendMessage(mCE.message.channel, "Only servers admins can change the prefix")
                 }
             }
-            else -> mCE.message.channel.createMessage("Prefixes cannot have whitespace")
+            else -> sendMessage(mCE.message.channel, "Prefixes cannot have whitespace")
         }
     }
 

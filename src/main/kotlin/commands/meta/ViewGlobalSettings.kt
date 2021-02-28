@@ -4,7 +4,6 @@ import Hakibot
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
 import dev.kord.common.Color
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.event.message.MessageCreateEvent
 
 object ViewGlobalSettings : BotCommand {
@@ -21,7 +20,7 @@ object ViewGlobalSettings : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         var numDisabled = 0
         val features = Hakibot.DisableableFeatures.values()
-        mCE.message.channel.createEmbed {
+        sendMessage(mCE.message.channel){
             title = "${Hakibot.BOT_NAME} Status"
             for (feature in features) {
                 field {
@@ -35,7 +34,6 @@ object ViewGlobalSettings : BotCommand {
                 }
             }
             color = Color((numDisabled * 255) / features.size, 255 - (numDisabled * 255) / features.size, 0)
-
         }
     }
 }

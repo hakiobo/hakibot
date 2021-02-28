@@ -48,7 +48,7 @@ object SearchForCPCommand : BotCommand {
                 }
                 if (channel != null) {
                     if (channel is GuildMessageChannelBehavior) {
-                        mCE.message.channel.createMessage("Beginning Search in ${channel.mention}")
+                        sendMessage(mCE.message.channel, "Beginning Search in ${channel.mention}")
                         val stats = intArrayOf(0, 0, 0, 0, 0)
                         try {
                             val col = db.getCollection<CustomPatreon>("cp")
@@ -59,7 +59,8 @@ object SearchForCPCommand : BotCommand {
                             this.dmUser(Hakibot.HAKIOBO_ID, "Some exception occured in reading ${channel.name}")
                             sendMessage(mCE.message.channel, "Failed after some point in time", 10_000)
                         }
-                        mCE.message.channel.createMessage(
+                        sendMessage(
+                            mCE.message.channel,
                             "Search Complete ${channel.mention}\n${stats.sum()} messages searched\n" +
                                     "${stats[0]} NonCps Found\n${stats[1]} new CPs added\n${stats[2]} Duplicate cps found\n" +
                                     "${stats[3]} CPs Updated\n${stats[4]} CPs Not Parsed"
@@ -99,7 +100,7 @@ object SearchForCPCommand : BotCommand {
                 )
             }
         } else {
-            mCE.message.channel.createMessage("Only Haki can use the CP Search command")
+            sendMessage(mCE.message.channel, "Only Haki can use the CP Search command")
         }
     }
 
@@ -139,7 +140,7 @@ object SearchForCPCommand : BotCommand {
                         }
                     }
                 } catch (e: Exception) {
-                    srcChannel.createMessage("Failed to Parse ${message.id}")
+                    sendMessage(srcChannel, "Failed to Parse ${message.id}")
                     return 4
                 }
             }

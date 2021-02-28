@@ -49,7 +49,7 @@ object OWOPraySettingsCommand : BotCommand {
                     HakiUser::_id eq user._id,
                     setValue(HakiUser::owoSettings / OWOSettings::prayRemind, !user.owoSettings.prayRemind)
                 )
-                mCE.message.channel.createMessage("owo pray/curse remind set to ${!user.owoSettings.prayRemind}")
+                sendMessage(mCE.message.channel, "owo pray/curse remind set to ${!user.owoSettings.prayRemind}")
             }
 
             1 -> {
@@ -59,7 +59,7 @@ object OWOPraySettingsCommand : BotCommand {
                             HakiUser::_id eq user._id,
                             setValue(HakiUser::owoSettings / OWOSettings::prayRemind, true)
                         )
-                        mCE.message.channel.createMessage("owo pray/curse remind set to true")
+                        sendMessage(mCE.message.channel, "owo pray/curse remind set to true")
                     }
 
                     "false" -> {
@@ -67,15 +67,15 @@ object OWOPraySettingsCommand : BotCommand {
                             HakiUser::_id eq user._id,
                             setValue(HakiUser::owoSettings / OWOSettings::prayRemind, false)
                         )
-                        mCE.message.channel.createMessage("owo pray/curse remind set to false")
+                        sendMessage(mCE.message.channel, "owo pray/curse remind set to false")
                     }
                     else -> {
-                        mCE.message.channel.createMessage("invalid pray/curse setting, can only be true or false")
+                        sendMessage(mCE.message.channel, "invalid pray/curse setting, can only be true or false")
                     }
                 }
             }
             else -> {
-                mCE.message.channel.createMessage("invalid pray/curse setting, can only be true or false")
+                sendMessage(mCE.message.channel, "invalid pray/curse setting, can only be true or false")
             }
         }
     }

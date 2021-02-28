@@ -24,6 +24,6 @@ object GuildsCommand : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         val guilds = mutableListOf<Guild>()
         client.guilds.onEach { guilds.add(it) }.collect()
-        mCE.message.channel.createMessage("${guilds.size} Hakibot Guilds")
+        sendMessage(mCE.message.channel, "${guilds.size} Hakibot Guilds")
     }
 }

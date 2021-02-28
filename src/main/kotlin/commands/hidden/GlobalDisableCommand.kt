@@ -68,7 +68,7 @@ object GlobalDisableCommand : BotCommand {
                 }
             }
         } else {
-            mCE.message.channel.createMessage("Only Haki can use this command")
+            sendMessage(mCE.message.channel, "Only Haki can use this command")
         }
     }
 }

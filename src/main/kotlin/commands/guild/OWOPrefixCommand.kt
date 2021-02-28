@@ -36,7 +36,7 @@ object OWOPrefixCommand : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         val guildID = mCE.guildId!!.asString
         when (args.size) {
-            0 -> mCE.message.channel.createMessage("Current owo prefix is ${getGuildInfo(mCE.guildId!!).owoPrefix}")
+            0 -> sendMessage(mCE.message.channel, "Current owo prefix is ${getGuildInfo(mCE.guildId!!).owoPrefix}")
             1 -> {
                 if (mCE.member?.getPermissions()
                         ?.contains(Permission.Administrator) == true || mCE.member?.id?.value == Hakibot.HAKIOBO_ID
@@ -46,14 +46,14 @@ object OWOPrefixCommand : BotCommand {
 //                    if (col.find(entities.HakiGuild::_id eq guildID).none()) {
 //                        col.insertOne(entities.HakiGuild(guildID, owoPrefix = args.first()))
 //                    } else {
-                        col.updateOne(HakiGuild::_id eq guildID, setValue(HakiGuild::owoPrefix, args.first()))
+                    col.updateOne(HakiGuild::_id eq guildID, setValue(HakiGuild::owoPrefix, args.first()))
 //                    }
-                    mCE.message.channel.createMessage("owo prefix set to ${args.first()}")
+                    sendMessage(mCE.message.channel, "owo prefix set to ${args.first()}")
                 } else {
-                    mCE.message.channel.createMessage("Only servers admins can change the owo prefix")
+                    sendMessage(mCE.message.channel, "Only servers admins can change the owo prefix")
                 }
             }
-            else -> mCE.message.channel.createMessage("Prefixes cannot have whitespace")
+            else -> sendMessage(mCE.message.channel, "Prefixes cannot have whitespace")
         }
     }
 

@@ -96,7 +96,7 @@ object DeleteOwOCount : BotCommand {
                 HakiUser::_id eq userToDelete,
                 user.copy(owoCount = user.owoCount.copy(count = user.owoCount.count - deleted.owoCount))
             )
-            msg.channel.createEmbed {
+            sendMessage(msg.channel) {
                 description = "Succesfully reset <@$userToDelete>'s owos!"
             }
             msg.edit {
@@ -107,9 +107,10 @@ object DeleteOwOCount : BotCommand {
             }
 
         } else if (deleted != null) {
-            msg.channel.createEmbed {
+            sendMessage(msg.channel) {
                 description = "Succesfully reset <@$userToDelete>'s owos!, but something didn't quite go right."
             }
+
             msg.edit {
                 embed {
                     msg.embeds[0].apply(this)

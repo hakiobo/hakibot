@@ -43,7 +43,7 @@ object OWOHuntSettingsCMD : BotCommand {
                         HakiUser::_id eq user._id,
                         setValue(HakiUser::owoSettings / OWOSettings::huntRemind, !user.owoSettings.huntRemind)
                 )
-                mCE.message.channel.createMessage("owohunt remind set to ${!user.owoSettings.huntRemind}")
+                sendMessage(mCE.message.channel, "owohunt remind set to ${!user.owoSettings.huntRemind}")
             }
 
             1 -> {
@@ -53,7 +53,7 @@ object OWOHuntSettingsCMD : BotCommand {
                                 HakiUser::_id eq user._id,
                                 setValue(HakiUser::owoSettings / OWOSettings::huntRemind, true)
                         )
-                        mCE.message.channel.createMessage("owohunt remind set to true")
+                        sendMessage(mCE.message.channel, "owohunt remind set to true")
                     }
 
                     "false" -> {
@@ -61,15 +61,15 @@ object OWOHuntSettingsCMD : BotCommand {
                                 HakiUser::_id eq user._id,
                                 setValue(HakiUser::owoSettings / OWOSettings::huntRemind, false)
                         )
-                        mCE.message.channel.createMessage("owohunt remind set to false")
+                        sendMessage(mCE.message.channel, "owohunt remind set to false")
                     }
                     else -> {
-                        mCE.message.channel.createMessage("invalid hunt setting, can only be true or false")
+                        sendMessage(mCE.message.channel, "invalid hunt setting, can only be true or false")
                     }
                 }
             }
             else -> {
-                mCE.message.channel.createMessage("invalid hunt setting, can only be true or false")
+                sendMessage(mCE.message.channel, "invalid hunt setting, can only be true or false")
             }
         }
     }

@@ -21,7 +21,8 @@ object WhoIsCommand : BotCommand {
         )
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
-        mCE.message.channel.createMessage(
+        sendMessage(
+            mCE.message.channel,
             client.getUser(Snowflake(args.firstOrNull()?.toLongOrNull() ?: 0L))?.tag ?: "no user found"
         )
     }

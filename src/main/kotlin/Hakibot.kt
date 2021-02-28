@@ -17,6 +17,7 @@ import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.behavior.MessageBehavior
 import dev.kord.core.behavior.channel.MessageChannelBehavior
+import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.Embed
 import dev.kord.core.entity.ReactionEmoji
 import dev.kord.core.entity.User
@@ -269,7 +270,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         if (triggersActive && guild.settings.enableTriggers) {
             val triggerText = triggers[mCE.message.content.toLowerCase()]
             if (triggerText != null) {
-                mCE.message.channel.createMessage(triggerText)
+                sendMessage(mCE.message.channel, triggerText)
             }
         }
 
@@ -302,11 +303,14 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
             if (!guild.settings.allowGlobalPrefix) {
-                mCE.message.channel.createMessage("Global $BOT_NAME prefix Disabled\nServer $BOT_NAME prefix is $pre")
+                sendMessage(mCE.message.channel, "Global $BOT_NAME prefix Disabled\nServer $BOT_NAME prefix is $pre")
             } else if (GLOBAL_PREFIX == pre) {
-                mCE.message.channel.createMessage("$BOT_NAME prefix is $pre")
+                sendMessage(mCE.message.channel, "$BOT_NAME prefix is $pre")
             } else {
-                mCE.message.channel.createMessage("Global $BOT_NAME prefix is $GLOBAL_PREFIX\nServer $BOT_NAME prefix is $pre")
+                sendMessage(
+                    mCE.message.channel,
+                    "Global $BOT_NAME prefix is $GLOBAL_PREFIX\nServer $BOT_NAME prefix is $pre"
+                )
             }
         }
 
@@ -379,7 +383,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             )
             client.launch {
                 delay((15_000 + time - Instant.now().toEpochMilli()).coerceAtLeast(1))
-                sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 5_000)
+                sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} hunt cooldown is done", 5_000, true)
             }
         }
 
@@ -401,7 +405,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             }
             client.launch {
                 delay((300_000 + time - Instant.now().toEpochMilli()).coerceAtLeast(1))
-                sendMessage(mCE.message.channel, "${mCE.message.author!!.mention} pray/curse cooldown is done")
+                sendMessage(
+                    mCE.message.channel,
+                    "${mCE.message.author!!.mention} pray/curse cooldown is done",
+                    mentionsAllowed = true
+                )
 
 //                delay(10_000)
 //                resp.delete()
@@ -418,7 +426,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
             return
         }
         try {
-            channel.createMessage(message)
+            sendMessage(channel, message)
         } catch (exception: RestRequestException) {
             if (user.id.value != HAKIOBO_ID) dmUser(HAKIOBO_ID, "Failed to send DM to ${user.tag}")
 
@@ -428,6 +436,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     private suspend fun handleDM(mCE: MessageCreateEvent) {
         if (mCE.message.content.takeLast(4).toLowerCase() == "when") {
             sendMessage(mCE.message.channel, "when", 10_000)
+            return
         }
 
         val split = (if (mCE.message.content.startsWith("h!", ignoreCase = true)) mCE.message.content.drop(2)
@@ -438,7 +447,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
         val cmd = lookupCMD(userCMD)
         if (cmd != null) {
             if (cmd.category == CommandCategory.GUILD) {
-                mCE.message.channel.createMessage("Guild related commands not allowed in DMs")
+                sendMessage(mCE.message.channel, "Guild related commands not allowed in DMs")
             } else {
                 cmd.runCMD(this, mCE, args)
             }
@@ -463,12 +472,34 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 //        , client.getUser(Snowflake( 304511726907293697))
         )
 
-    internal suspend fun sendMessage(channel: MessageChannelBehavior, message: String, deleteAfterMS: Long = 0L) {
+    internal suspend fun sendMessage(
+        channel: MessageChannelBehavior,
+        message: String = "",
+        deleteAfterMS: Long = 0L,
+        mentionsAllowed: Boolean = false,
+        embedToSend: (EmbedBuilder.() -> Unit)? = null,
+    ) {
         client.launch {
             if (deleteAfterMS == 0L) {
-                channel.createMessage(message)
+                channel.createMessage {
+                    content = message
+                    if (!mentionsAllowed) {
+                        allowedMentions()
+                    }
+                    if (embedToSend != null) {
+                        embed(embedToSend)
+                    }
+                }
             } else {
-                val msg = channel.createMessage(message)
+                val msg = channel.createMessage {
+                    content = message
+                    if (!mentionsAllowed) {
+                        allowedMentions()
+                    }
+                    if (embedToSend != null) {
+                        embed(embedToSend)
+                    }
+                }
                 delay(deleteAfterMS)
                 msg.delete()
             }
@@ -487,11 +518,11 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     internal suspend fun messageChannelById(
         channelId: Long,
         message: String,
-        embed: EmbedBuilder? = null
+        embedBuilder: EmbedBuilder? = null
     ): DiscordMessage {
         return client.rest.channel.createMessage(Snowflake(channelId)) {
-            this.embed = embed
-            this.content = message
+            embed = embedBuilder
+            content = message
         }
     }
 

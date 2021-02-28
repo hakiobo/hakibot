@@ -23,7 +23,8 @@ interface SettingsCommand : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         when (args.size) {
             0 -> {
-                mCE.message.channel.createMessage(
+                sendMessage(
+                    mCE.message.channel,
                     "Current setting is `${setting.get(getGuildInfo(mCE.guildId!!).settings)}`"
                 )
             }

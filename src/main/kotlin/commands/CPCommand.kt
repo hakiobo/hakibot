@@ -5,7 +5,6 @@ import entities.CustomPatreon
 import Hakibot
 import com.mongodb.client.MongoCollection
 import commands.utils.*
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.event.message.MessageCreateEvent
 import math.count
 import org.bson.conversions.Bson
@@ -64,7 +63,7 @@ object CPCommand : BotCommand {
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         val cpCol = db.getCollection<CustomPatreon>("cp")
         if (args.isEmpty()) {
-            mCE.message.channel.createMessage("${cpCol.countDocuments()} total pets stored")
+            sendMessage(mCE.message.channel, "${cpCol.countDocuments()} total pets stored")
             return
         }
         val author = mCE.message.author!!
@@ -72,25 +71,31 @@ object CPCommand : BotCommand {
             "add", "a" -> {
                 if (author.id.value in getCPAdders()) {
                     if (args.size != 8) {
-                        mCE.message.channel.createMessage("wrong format for adding cp, expecting `h! cp $cmd <name> <hp> <str> <pr> <wp> <mag> <mr>`")
+                        sendMessage(
+                            mCE.message.channel,
+                            "wrong format for adding cp, expecting `h! cp $cmd <name> <hp> <str> <pr> <wp> <mag> <mr>`"
+                        )
                         return
                     }
                     val name = args[1].toLowerCase()
                     val stats = args.drop(2).map { it.toIntOrNull() ?: -1 }
                     if (stats.any { it < 0 }) {
-                        mCE.message.channel.createMessage("wrong format for adding cp, expecting `h! cp $cmd <name> <hp> <str> <pr> <wp> <mag> <mr>`")
+                        sendMessage(
+                            mCE.message.channel,
+                            "wrong format for adding cp, expecting `h! cp $cmd <name> <hp> <str> <pr> <wp> <mag> <mr>`"
+                        )
                         return
                     }
 
                     val cp = CustomPatreon(name, stats[0], stats[1], stats[2], stats[3], stats[4], stats[5])
                     if (cpCol.find(CustomPatreon::name eq cp.name).none()) {
                         cpCol.insertOne(cp)
-                        mCE.message.channel.createMessage("Successfully added $name")
+                        sendMessage(mCE.message.channel, "Successfully added $name")
                     } else {
-                        mCE.message.channel.createMessage("CP already in database")
+                        sendMessage(mCE.message.channel, "CP already in database")
                     }
                 } else {
-                    mCE.message.channel.createMessage("You do not have permission to add to the cp database")
+                    sendMessage(mCE.message.channel, "You do not have permission to add to the cp database")
                 }
             }
             "get", "dex", "d" -> {
@@ -99,18 +104,18 @@ object CPCommand : BotCommand {
                     if (cp == null) {
                         sendMessage(mCE.message.channel, "could not find cp ${args[1]}", 10_000)
                     } else {
-//                        mCE.message.channel.createMessage(cp.toString())
-                        mCE.message.channel.createEmbed {
+//                        sendMessage(mCE.message.channel, cp.toString())
+                        sendMessage(mCE.message.channel) {
                             cp.toEmbed(this)
                         }
                     }
                 } else if (args.size > 2) {
                     val cps = getCPs(args, cpCol)
-                    mCE.message.channel.createMessage(cps.joinToString("\n") {
+                    sendMessage(mCE.message.channel, cps.joinToString("\n") {
                         it?.simpleString() ?: "CP Not Found"
                     })
                 } else {
-                    mCE.message.channel.createMessage("Invalid syntax! expecting `h!cp $cmd <cp names>`")
+                    sendMessage(mCE.message.channel, "Invalid syntax! expecting `h!cp $cmd <cp names>`")
                 }
             }
 
@@ -134,23 +139,29 @@ object CPCommand : BotCommand {
             "delete", "del" -> {
                 if (mCE.message.author?.id?.value == Hakibot.HAKIOBO_ID) {
                     if (args.size != 2) {
-                        mCE.message.channel.createMessage("wrong format for deleting cp entry, expecting `h!cp $cmd <name>`")
+                        sendMessage(
+                            mCE.message.channel,
+                            "wrong format for deleting cp entry, expecting `h!cp $cmd <name>`"
+                        )
                     } else {
                         val search = cpCol.findOneAndDelete(CustomPatreon::name eq args[1])
                         if (search == null) {
-                            mCE.message.channel.createMessage("Could not find CP ${args[1]}")
+                            sendMessage(mCE.message.channel, "Could not find CP ${args[1]}")
                         } else {
-                            mCE.message.channel.createMessage("Successfully deleted ${search.name}")
+                            sendMessage(mCE.message.channel, "Successfully deleted ${search.name}")
                         }
                     }
                 } else {
-                    mCE.message.channel.createMessage("Only Haki can delete cps")
+                    sendMessage(mCE.message.channel, "Only Haki can delete cps")
                 }
             }
             "search", "s", "query", "q" -> {
                 val filters = mutableListOf<Bson>()
                 suspend fun badFormat() {
-                    mCE.message.channel.createMessage("Correct format is `h!cp $cmd <hp> <att> <pr> <wp> <mag> <mr>` where each stat is a number or * for any value")
+                    sendMessage(
+                        mCE.message.channel,
+                        "Correct format is `h!cp $cmd <hp> <att> <pr> <wp> <mag> <mr>` where each stat is a number or * for any value"
+                    )
                 }
                 if (args.size == 7) {
                     val props = arrayOf(
@@ -202,7 +213,7 @@ object CPCommand : BotCommand {
                     }
                     val query = cpCol.find(and(filters)).sort(ascending(CustomPatreon::name))
                     if (query.none()) {
-                        mCE.message.channel.createMessage("Found no cps with those stats")
+                        sendMessage(mCE.message.channel, "Found no cps with those stats")
                     } else {
                         val sbMessage = StringBuilder("Cps matching query: ${query.count()}\n")
                         for (cp in query) {
@@ -211,9 +222,12 @@ object CPCommand : BotCommand {
                         }
 
                         if (sbMessage.length > 2000) {
-                            mCE.message.channel.createMessage("${query.count()} Cps. Result too long to fit in single message. I'll eventually add pagination")
+                            sendMessage(
+                                mCE.message.channel,
+                                "${query.count()} Cps. Result too long to fit in single message. I'll eventually add pagination"
+                            )
                         } else {
-                            mCE.message.channel.createMessage(sbMessage.toString())
+                            sendMessage(mCE.message.channel, sbMessage.toString())
                         }
                     }
                 } else {
@@ -224,7 +238,8 @@ object CPCommand : BotCommand {
             "y", "qy", "year", "qyear" -> {
                 if (args.size == 2) {
                     val year = args.last().toIntOrNull()
-                    mCE.message.channel.createMessage(
+                    sendMessage(
+                        mCE.message.channel,
                         cpCol.find(CustomPatreon::creationInfo / CreationInfo::year eq year).count().toString()
                     )
                 } else {
@@ -242,9 +257,7 @@ object CPCommand : BotCommand {
                     )
                     val search = cpCol.find(CustomPatreon::creationInfo eq cInfo).sort(ascending(CustomPatreon::name))
                         .map { it.name }
-                    mCE.message.channel.createMessage(
-                        "${search.joinToString("\n")}\n${search.count()}"
-                    )
+                    sendMessage(mCE.message.channel, "${search.joinToString("\n")}\n${search.count()}")
                 } else {
                     sendMessage(mCE.message.channel, "Correct format is `h!cp $cmd <month> <year>`", 5_000)
                 }
@@ -255,13 +268,13 @@ object CPCommand : BotCommand {
                     if (cp == null) {
                         sendMessage(mCE.message.channel, "could not find cp $cmd", 10_000)
                     } else {
-                        mCE.message.channel.createEmbed {
+                        sendMessage(mCE.message.channel) {
                             cp.toEmbed(this)
                         }
                     }
                 } else {
                     val cps = getCPs(args, cpCol)
-                    mCE.message.channel.createMessage(cps.joinToString("\n") {
+                    sendMessage(mCE.message.channel, cps.joinToString("\n") {
                         it?.simpleString() ?: "CP Not Found"
                     })
                 }

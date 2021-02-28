@@ -3,7 +3,6 @@ package commands.guild
 import Hakibot
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.event.message.MessageCreateEvent
 import entities.HakiGuild
 import org.litote.kmongo.eq
@@ -41,8 +40,9 @@ object GuildStatus : BotCommand {
         if (guild == null) {
             sendMessage(mCE.message.channel, "no data found for this server somehow. sad", 5_000)
         } else {
-            mCE.message.channel.createEmbed {
-                title = " ${Hakibot.BOT_NAME} Settings for ${mCE.getGuild()!!.name}"
+            val guildName = mCE.getGuild()!!.name
+            sendMessage(mCE.message.channel) {
+                title = " ${Hakibot.BOT_NAME} Settings for $guildName"
                 description =
                     "Prefix: ${guild.prefix}\n" +
                             "Global Prefix (${Hakibot.GLOBAL_PREFIX}) Enabled : ${Hakibot.getCheckmarkOrCross(guild.settings.allowGlobalPrefix)}\n" +
@@ -51,7 +51,8 @@ object GuildStatus : BotCommand {
                             "When Responses Enabled: ${Hakibot.getCheckmarkOrCross(guild.settings.enableWhen)}\n" +
                             "OwO Counting Enabled: ${Hakibot.getCheckmarkOrCross(guild.settings.owoCountingEnabled)}\n"
                 field {
-                    value = "Questions? Ask in the official [Hakibot Server](https://discord.gg/${Hakibot.SERVER_CODE})!"
+                    value =
+                        "Questions? Ask in the official [Hakibot Server](https://discord.gg/${Hakibot.SERVER_CODE})!"
                 }
             }
         }

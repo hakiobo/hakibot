@@ -3,8 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     application
     kotlin("jvm") version "1.4.0"
+    java
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
-application.mainClassName = "BotKt"
+
 group = "me.huebnerj"
 version = "1.0-SNAPSHOT"
 
@@ -26,17 +28,17 @@ dependencies {
 
 }
 
-tasks.jar {
-    manifest {
-            attributes["Main-Class"] = "BotKt"
-        }
-    from(sourceSets.main.get().output)
-//    dependsOn(configurations.runtimeClasspath)
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-    })
-    archiveFileName.set("Hakibot.jar")
-}
+//tasks.jar {
+//    manifest {
+//            attributes["Main-Class"] = "BotKt"
+//        }
+//    from(sourceSets.main.get().output)
+////    dependsOn(configurations.runtimeClasspath)
+//    from({
+//        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+//    })
+//    archiveFileName.set("Hakibot.jar")
+//}
 //val compileJarKotlin: KotlinCompile by tasks
 //compileJarKotlin.kotlinOptions.includeRuntime = true
 
@@ -44,4 +46,8 @@ tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "11"
     }
+}
+
+application {
+    mainClassName = "BotKt"
 }

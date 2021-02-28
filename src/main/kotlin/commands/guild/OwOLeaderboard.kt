@@ -65,9 +65,10 @@ object OwOLeaderboard : BotCommand {
                 }
 
                 val names = userCol.find(or(filters)).toList()
-                mCE.message.channel.createEmbed {
+                val guildName = mCE.getGuild()?.name ?: "No Name????"
+                sendMessage(mCE.message.channel) {
                     color = Color(0xABCDEF)
-                    title = "${type.desc}OwO Leaderboard for ${mCE.getGuild()?.name ?: "No Name????"}"
+                    title = "${type.desc}OwO Leaderboard for $guildName"
                     if (type == RankingType.GLOBAL) {
                         title = "${type.desc}OwO Leaderboard"
                     }

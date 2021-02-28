@@ -3,7 +3,6 @@ package commands.meta
 import Hakibot
 import commands.utils.*
 import dev.kord.common.Color
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.event.message.MessageCreateEvent
 import java.util.*
 
@@ -17,11 +16,15 @@ object HelpCommand : BotCommand {
 
     override val usages: List<CommandUsage>
         get() = listOf(
-                CommandUsage(emptyList(), "Displays a list of all commands"),
-                CommandUsage(listOf(Argument("command", ArgumentType.PARAMETER)),
-                        "Displays Info about a specific command"),
-                CommandUsage(listOf(Argument("category", ArgumentType.FLAG_PARAM)),
-                        "Displays a list of all commands in a specific category"),
+            CommandUsage(emptyList(), "Displays a list of all commands"),
+            CommandUsage(
+                listOf(Argument("command", ArgumentType.PARAMETER)),
+                "Displays Info about a specific command"
+            ),
+            CommandUsage(
+                listOf(Argument("category", ArgumentType.FLAG_PARAM)),
+                "Displays a list of all commands in a specific category"
+            ),
         )
 
     override val category: CommandCategory
@@ -41,7 +44,7 @@ object HelpCommand : BotCommand {
 //                    helpMSG.append("${cmd.name}\n")
 //                }
 //                helpMSG.append("```")
-                mCE.message.channel.createEmbed {
+                sendMessage(mCE.message.channel) {
                     title = "${Hakibot.BOT_NAME} Available Commands"
                     color = Color(0x00FF00)
                     footer {
@@ -57,15 +60,15 @@ object HelpCommand : BotCommand {
                         }
                     }
                 }
-//                mCE.message.channel.createMessage(helpMSG.toString())
             }
             else -> {
                 if (args.first().startsWith("-")) {
                     val categoryStr = args.joinToString(" ").drop(1)
-                    val category = CommandCategory.values().find { it.category.toLowerCase() == categoryStr.toLowerCase().trim() }
+                    val category =
+                        CommandCategory.values().find { it.category.toLowerCase() == categoryStr.toLowerCase().trim() }
                     val cmds = commands.filter { it.category == category }
                     if (cmds.isNotEmpty()) {
-                        mCE.message.channel.createEmbed {
+                        sendMessage(mCE.message.channel) {
                             title = "${category!!.category} Commands"
                             description = cmds.map { it.name }.joinToString("\n")
                         }
@@ -93,7 +96,7 @@ object HelpCommand : BotCommand {
                                 helpMSG.append("\n`h!${cmd.name}")
                                 for (arg in usage.args) {
                                     helpMSG.append(" ").append(arg.argType.prefix).append(arg.text)
-                                            .append(arg.argType.suffix)
+                                        .append(arg.argType.suffix)
                                 }
                                 helpMSG.append("`- ${usage.description}")
                                 if (usage.accessType != AccessType.EVERYONE) {
@@ -101,7 +104,7 @@ object HelpCommand : BotCommand {
                                 }
                             }
                         }
-                        mCE.message.channel.createMessage(helpMSG.toString())
+                        sendMessage(mCE.message.channel, helpMSG.toString())
                     } else {
                         sendMessage(mCE.message.channel, "No ${args.first()} command found", 5_000)
                     }
