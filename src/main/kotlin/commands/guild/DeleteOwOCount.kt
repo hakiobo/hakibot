@@ -14,8 +14,6 @@ import entities.HakiUser
 import entities.UserGuildOwOCount
 import kotlinx.coroutines.delay
 import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
 
 object DeleteOwOCount : BotCommand {
     override val name: String

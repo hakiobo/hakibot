@@ -6,7 +6,6 @@ import commands.utils.*
 import dev.kord.common.entity.Permission
 import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.eq
-import org.litote.kmongo.getCollection
 import org.litote.kmongo.setValue
 
 object PrefixCommand : BotCommand {

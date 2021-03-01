@@ -25,8 +25,11 @@ object LogoutCommand : BotCommand {
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         if (mCE.message.author?.id?.value == 292483348738080769) {
-            messageChannelById(ONLINE_CHANNEL, "Offline: ${args.joinToString(" ")}!")
-            client.shutdown()
+            try {
+                messageChannelById(ONLINE_CHANNEL, "Offline: ${args.joinToString(" ")}!")
+            } finally {
+                client.shutdown()
+            }
         }
     }
 

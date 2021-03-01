@@ -2,7 +2,6 @@ package commands.hidden
 
 import entities.CustomPatreon
 import Hakibot
-import com.mongodb.client.MongoCollection
 import commands.utils.*
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.GuildMessageChannelBehavior
@@ -11,6 +10,7 @@ import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.flow.collect
 import org.litote.kmongo.*
+import org.litote.kmongo.coroutine.CoroutineCollection
 
 import kotlin.Exception
 
@@ -106,7 +106,7 @@ object SearchForCPCommand : BotCommand {
 
     private suspend fun Hakibot.parseMessage(
         message: Message,
-        col: MongoCollection<CustomPatreon>,
+        col: CoroutineCollection<CustomPatreon>,
         srcChannel: MessageChannelBehavior
     ): Int {
         if (message.author?.id?.value == Hakibot.OWO_ID) {

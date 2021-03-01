@@ -139,7 +139,7 @@ data class UserGuildOwOCount(
 //            }
 //        }
 
-        fun Hakibot.countOwO(mCE: MessageCreateEvent, user: HakiUser, guild: HakiGuild) {
+        suspend fun Hakibot.countOwO(mCE: MessageCreateEvent, user: HakiUser, guild: HakiGuild) {
             if(!guild.settings.owoCountingEnabled) return
             val newInstant = mCE.message.id.toInstant()
             if (Duration.between(Instant.ofEpochMilli(user.owoCount.lastOwO), newInstant).seconds < OWO_CD) return

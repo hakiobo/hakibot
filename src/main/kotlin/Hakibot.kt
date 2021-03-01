@@ -1,6 +1,4 @@
 import entities.UserGuildOwOCount.Companion.countOwO
-import com.mongodb.client.MongoCollection
-import com.mongodb.client.MongoDatabase
 import commands.*
 import commands.guild.*
 import commands.guild.DeleteOwOCount.cancelDeletion
@@ -33,13 +31,15 @@ import entities.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
+import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.CoroutineDatabase
 import java.lang.Exception
 import java.time.Instant
 import java.time.ZoneId
 import java.util.regex.Pattern
 import kotlin.reflect.KMutableProperty1
 
-class Hakibot(val client: Kord, val db: MongoDatabase) {
+class Hakibot(val client: Kord, val db: CoroutineDatabase) {
     @Volatile
     internal var huntReminders = true
 
@@ -173,7 +173,7 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
     suspend fun getUserFromDB(
         userID: Snowflake,
         u: User? = null,
-        col: MongoCollection<HakiUser> = db.getCollection<HakiUser>("users")
+        col: CoroutineCollection<HakiUser> = db.getCollection<HakiUser>("users")
     ): HakiUser {
         val query = col.findOne(HakiUser::_id eq userID.asString)
         return if (query == null) {
@@ -316,9 +316,9 @@ class Hakibot(val client: Kord, val db: MongoDatabase) {
 
     }
 
-    fun getGuildInfo(
+    suspend fun getGuildInfo(
         guild: Snowflake,
-        col: MongoCollection<HakiGuild> = db.getCollection<HakiGuild>("guilds")
+        col: CoroutineCollection<HakiGuild> = db.getCollection<HakiGuild>("guilds")
     ): HakiGuild {
         return col.findOne(HakiGuild::_id eq guild.asString) ?: HakiGuild(guild.asString)
     }

@@ -10,7 +10,6 @@ import commands.utils.CommandUsage
 import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
-import org.litote.kmongo.getCollection
 import org.litote.kmongo.setValue
 
 object OWOHuntSettingsCMD : BotCommand {

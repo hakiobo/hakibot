@@ -6,8 +6,6 @@ import commands.utils.CommandCategory
 import dev.kord.core.event.message.MessageCreateEvent
 import entities.HakiGuild
 import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
 
 object GuildStatus : BotCommand {
     override val name: String

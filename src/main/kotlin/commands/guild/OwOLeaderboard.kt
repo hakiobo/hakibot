@@ -6,14 +6,15 @@ import commands.utils.BotCommand
 import commands.utils.CommandCategory
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.event.message.MessageCreateEvent
 import entities.HakiUser
 import org.litote.kmongo.*
+import org.litote.kmongo.coroutine.aggregate
 import toInstant
 import java.time.Duration
 import java.time.Instant
 import kotlin.reflect.KProperty1
+import kotlin.reflect.KSuspendFunction4
 
 object OwOLeaderboard : BotCommand {
     override val name: String
@@ -200,7 +201,7 @@ object OwOLeaderboard : BotCommand {
     }
 
 
-    private fun getTotalIdDataPairs(
+    private suspend fun getTotalIdDataPairs(
         bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
@@ -213,7 +214,7 @@ object OwOLeaderboard : BotCommand {
         ).toList().map { Pair(it.user, unit.curStat.get(it)) }
     }
 
-    private fun getCurrentIdDataPairs(
+    private suspend fun getCurrentIdDataPairs(
         bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
@@ -227,7 +228,7 @@ object OwOLeaderboard : BotCommand {
         ).toList().map { Pair(it.user, unit.curStat.get(it)) }
     }
 
-    private fun getPreviousIdDataPairs(
+    private suspend fun getPreviousIdDataPairs(
         bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
@@ -253,7 +254,7 @@ object OwOLeaderboard : BotCommand {
             ).sortedByDescending { it.second }.take(size)
     }
 
-    private fun getGlobalIdPairs(
+    private suspend fun getGlobalIdPairs(
         bot: Hakibot,
         mCE: MessageCreateEvent,
         unit: TimeUnit,
@@ -267,7 +268,7 @@ object OwOLeaderboard : BotCommand {
 
     private enum class IntervalType(
         val note: String?,
-        val getIdDataPairs: (Hakibot, MessageCreateEvent, TimeUnit, Int) -> List<Pair<Long, Int>>
+        val getIdDataPairs: KSuspendFunction4<Hakibot, MessageCreateEvent, TimeUnit, Int, List<Pair<Long, Int>>>
     ) {
         GLOBAL(null, OwOLeaderboard::getGlobalIdPairs),
         TOTAL(null, OwOLeaderboard::getTotalIdDataPairs),

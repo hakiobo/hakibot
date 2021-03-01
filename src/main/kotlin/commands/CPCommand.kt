@@ -3,12 +3,12 @@ package commands
 import entities.CreationInfo
 import entities.CustomPatreon
 import Hakibot
-import com.mongodb.client.MongoCollection
 import commands.utils.*
 import dev.kord.core.event.message.MessageCreateEvent
 import math.count
 import org.bson.conversions.Bson
 import org.litote.kmongo.*
+import org.litote.kmongo.coroutine.CoroutineCollection
 
 object CPCommand : BotCommand {
 
@@ -88,7 +88,7 @@ object CPCommand : BotCommand {
                     }
 
                     val cp = CustomPatreon(name, stats[0], stats[1], stats[2], stats[3], stats[4], stats[5])
-                    if (cpCol.find(CustomPatreon::name eq cp.name).none()) {
+                    if (cpCol.find(CustomPatreon::name eq cp.name).toList().none()) {
                         cpCol.insertOne(cp)
                         sendMessage(mCE.message.channel, "Successfully added $name")
                     } else {
@@ -211,7 +211,7 @@ object CPCommand : BotCommand {
                         }
 
                     }
-                    val query = cpCol.find(and(filters)).sort(ascending(CustomPatreon::name))
+                    val query = cpCol.find(and(filters)).sort(ascending(CustomPatreon::name)).toList()
                     if (query.none()) {
                         sendMessage(mCE.message.channel, "Found no cps with those stats")
                     } else {
@@ -240,7 +240,7 @@ object CPCommand : BotCommand {
                     val year = args.last().toIntOrNull()
                     sendMessage(
                         mCE.message.channel,
-                        cpCol.find(CustomPatreon::creationInfo / CreationInfo::year eq year).count().toString()
+                        cpCol.find(CustomPatreon::creationInfo / CreationInfo::year eq year).toList().count().toString()
                     )
                 } else {
                     sendMessage(mCE.message.channel, "Correct format is `h!cp $cmd <year>`", 5_000)
@@ -255,7 +255,7 @@ object CPCommand : BotCommand {
                         month,
                         if (year < 100) 2000 + year else year
                     )
-                    val search = cpCol.find(CustomPatreon::creationInfo eq cInfo).sort(ascending(CustomPatreon::name))
+                    val search = cpCol.find(CustomPatreon::creationInfo eq cInfo).sort(ascending(CustomPatreon::name)).toList()
                         .map { it.name }
                     sendMessage(mCE.message.channel, "${search.joinToString("\n")}\n${search.count()}")
                 } else {
@@ -282,25 +282,25 @@ object CPCommand : BotCommand {
         }
     }
 
-    private fun Hakibot.getCPsRegex(
+    private suspend fun Hakibot.getCPsRegex(
         name: String,
-        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+        cpCol: CoroutineCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
     ): List<CustomPatreon> {
         return cpCol.find(or(CustomPatreon::name regex name, CustomPatreon::aliases regex name)).toList()
     }
 
-    private fun Hakibot.getCPs(
+    private suspend fun Hakibot.getCPs(
         names: List<String>,
-        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+        cpCol: CoroutineCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
     ): List<CustomPatreon?> {
         return List(names.size) { idx ->
             getCP(names[idx], cpCol)
         }
     }
 
-    private fun Hakibot.getCP(
+    private suspend fun Hakibot.getCP(
         name: String,
-        cpCol: MongoCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
+        cpCol: CoroutineCollection<CustomPatreon> = db.getCollection<CustomPatreon>("cp")
     ): CustomPatreon? {
         return cpCol.findOne(or(CustomPatreon::name eq name, CustomPatreon::aliases contains name))
     }
