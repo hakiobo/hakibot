@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.4.30"
     java
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
@@ -17,24 +17,10 @@ repositories {
 }
 dependencies {
     testImplementation(kotlin("test-testng"))
-    implementation("dev.kord:kord-core:0.7.0-SNAPSHOT")
-    implementation("org.slf4j:slf4j-simple:1.7.30")
-    implementation("org.litote.kmongo:kmongo-coroutine:4.2.4")
+    implementation("dev.kord", "kord-core", "0.7.0-SNAPSHOT")
+    implementation("org.slf4j", "slf4j-simple", "1.7.30")
+    implementation("org.litote.kmongo", "kmongo-coroutine", "4.2.4")
 }
-
-//tasks.jar {
-//    manifest {
-//            attributes["Main-Class"] = "BotKt"
-//        }
-//    from(sourceSets.main.get().output)
-////    dependsOn(configurations.runtimeClasspath)
-//    from({
-//        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
-//    })
-//    archiveFileName.set("Hakibot.jar")
-//}
-//val compileJarKotlin: KotlinCompile by tasks
-//compileJarKotlin.kotlinOptions.includeRuntime = true
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
