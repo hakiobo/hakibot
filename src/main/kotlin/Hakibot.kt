@@ -96,6 +96,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         GuildStatus,
         DisableCounting,
         DeleteOwOCount,
+        Patreon,
     )
 
     suspend fun startUp() {

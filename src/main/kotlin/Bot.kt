@@ -2,6 +2,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.WriteConcern
 import dev.kord.core.Kord
+import dev.kord.core.builder.kord.Shards
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
@@ -11,13 +12,11 @@ val MONGO_CONNECT_URI =
     ConnectionString("mongodb+srv://${System.getenv("db-user")}:${System.getenv("db-pass")}@${System.getenv("db-address")}/Hakibot")
 
 
-@ExperimentalTime
-@ObsoleteCoroutinesApi
 suspend fun main() {
     val discordClient = Kord(System.getenv("hakibot-token")) {
         this.sharding { recommended ->
             println(recommended)
-            0..0
+            Shards(1)
         }
     }
     val mongoSettings =

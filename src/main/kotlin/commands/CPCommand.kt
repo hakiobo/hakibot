@@ -16,7 +16,7 @@ object CPCommand : BotCommand {
         get() = "cp"
 
     override val aliases: List<String>
-        get() = listOf("custompatreon", "patreon", "pet", "pets", "cps")
+        get() = listOf("custompatreon", "pet", "pets", "cps")
 
     override val description: String
         get() = "Get or Query cp stats"
