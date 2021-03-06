@@ -21,7 +21,7 @@ object DeleteOwOCount : BotCommand {
     override val description: String
         get() = "Resets the owo count for the specified member in this server"
     override val aliases: List<String>
-        get() = listOf("eraseowo", "clearowo")
+        get() = listOf("eraseowo", "clearowo", "oworeset")
     override val category: CommandCategory
         get() = CommandCategory.GUILD
     override val usages: List<CommandUsage>

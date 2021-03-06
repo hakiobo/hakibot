@@ -2,6 +2,7 @@ package commands
 
 import Hakibot
 import commands.utils.BotCommand
+import commands.utils.CommandCategory
 import commands.utils.CommandUsage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
@@ -19,10 +20,13 @@ object Ping : BotCommand {
         get() = listOf("pong")
     override val usages: List<CommandUsage>
         get() = listOf(CommandUsage(listOf(), "Ping ${Hakibot.BOT_NAME}!"))
+    override val category: CommandCategory
+        get() = CommandCategory.HAKIBOT
 
     override suspend fun Hakibot.cmd(mCE: MessageCreateEvent, args: List<String>) {
         val received = Instant.now()
-        val msg = "\ud83c\udfd3 Pong! Received in ${Duration.between(mCE.message.id.toInstant(), received).toMillis()} ms"
+        val msg =
+            "\ud83c\udfd3 Pong! Received in ${Duration.between(mCE.message.id.toInstant(), received).toMillis()} ms"
         val sent = mCE.message.reply {
             content = "$msg\nReply Sent In `Waiting . . .`"
             this.allowedMentions {

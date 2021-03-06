@@ -5,10 +5,7 @@ import com.mongodb.client.model.UpdateOptions
 import dev.kord.core.event.message.MessageCreateEvent
 import org.litote.kmongo.*
 import toInstant
-import java.time.Duration
-import java.time.Instant
-import java.time.Year
-import java.time.ZoneId
+import java.time.*
 
 data class UserGuildOwOCount(
     val _id: String,
@@ -140,9 +137,13 @@ data class UserGuildOwOCount(
 //        }
 
         suspend fun Hakibot.countOwO(mCE: MessageCreateEvent, user: HakiUser, guild: HakiGuild) {
-            if(!guild.settings.owoCountingEnabled) return
+            if (!guild.settings.owoCountingEnabled) return
             val newInstant = mCE.message.id.toInstant()
-            if (Duration.between(Instant.ofEpochMilli(user.owoCount.lastOwO), newInstant).seconds < OWO_CD) return
+            val duration = Duration.between(Instant.ofEpochMilli(user.owoCount.lastOwO), newInstant).seconds
+            if (duration < OWO_CD) return
+            if (guild._id.toLong() == Hakibot.LXV_SERVER && newInstant.atZone(Hakibot.PST).toLocalDate().run {
+                    year == 2021 && month == Month.MARCH && dayOfMonth == 6
+                } && duration < 13) return
             val col = db.getCollection<UserGuildOwOCount>("owo-count")
             val id = "${user._id}|${guild._id}"
             val entry = col.findOne(UserGuildOwOCount::_id eq id)

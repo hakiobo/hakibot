@@ -44,12 +44,13 @@ object HelpCommand : BotCommand {
 //                    helpMSG.append("${cmd.name}\n")
 //                }
 //                helpMSG.append("```")
+                val self = client.getSelf()
                 sendMessage(mCE.message.channel) {
                     title = "${Hakibot.BOT_NAME} Available Commands"
                     color = Color(0x00FF00)
                     footer {
-                        icon = "https://cdn.discordapp.com/emojis/770777353956753419.png"
-                        text = "h!help <cmd> for more information about a specific command"
+                        icon = self.avatar.url
+                        text = "${Hakibot.GLOBAL_PREFIX}help <cmd> for more information about a specific command"
                     }
                     for ((category, cmds) in map) {
                         if (category != CommandCategory.HIDDEN) {
@@ -93,7 +94,7 @@ object HelpCommand : BotCommand {
                             helpMSG.append("**None**")
                         } else {
                             for (usage in cmd.usages) {
-                                helpMSG.append("\n`h!${cmd.name}")
+                                helpMSG.append("\n`${Hakibot.GLOBAL_PREFIX}${cmd.name}")
                                 for (arg in usage.args) {
                                     helpMSG.append(" ").append(arg.argType.prefix).append(arg.text)
                                         .append(arg.argType.suffix)

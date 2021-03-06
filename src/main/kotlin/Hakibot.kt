@@ -314,7 +314,6 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 )
             }
         }
-
     }
 
     suspend fun getGuildInfo(
@@ -325,7 +324,6 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
     }
 
     private suspend fun handleCommand(mCE: MessageCreateEvent, msg: String) {
-//        val start = Instant.now()
         val split = msg.split(Pattern.compile("\\s+"))
         val userCMD = split.first().toLowerCase()
         val args = split.drop(1)
@@ -336,14 +334,6 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         } else {
             sendMessage(mCE.message.channel, "$userCMD is not a valid command", 5_000)
         }
-//        val end = Instant.now()
-//        val betw = Duration.between(start, end).seconds
-//        if (betw > abnormalThreshold) {
-//            println("Slow Command: $userCMD")
-//            println("Time: $betw seconds")
-//            println("Author: ${mCE.message.author?.tag} id: ${mCE.message.author?.id}")
-//            println("Message: ${mCE.message.content}")
-//        }
     }
 
     internal fun lookupCMD(userCMD: String): BotCommand? {
