@@ -141,9 +141,6 @@ data class UserGuildOwOCount(
             val newInstant = mCE.message.id.toInstant()
             val duration = Duration.between(Instant.ofEpochMilli(user.owoCount.lastOwO), newInstant).seconds
             if (duration < OWO_CD) return
-            if (guild._id.toLong() == Hakibot.LXV_SERVER && newInstant.atZone(Hakibot.PST).toLocalDate().run {
-                    year == 2021 && month == Month.MARCH && dayOfMonth == 6
-                } && duration < 13) return
             val col = db.getCollection<UserGuildOwOCount>("owo-count")
             val id = "${user._id}|${guild._id}"
             val entry = col.findOne(UserGuildOwOCount::_id eq id)
