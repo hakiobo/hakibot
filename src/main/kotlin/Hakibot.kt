@@ -288,19 +288,18 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 mCE,
                 guild,
                 mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(),
-//                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
-            )
-        } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
-            handleOWOCommand(
-                mCE,
-                guild,
-                mCE.message.content.drop(owoPre.length).trim(),
-//                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
             )
         } else {
             if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
                 countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
             }
+        }
+        if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
+            handleOWOCommand(
+                mCE,
+                guild,
+                mCE.message.content.drop(owoPre.length).trim(),
+            )
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
             if (!guild.settings.allowGlobalPrefix) {
@@ -344,7 +343,6 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         }
         return null
     }
-
     private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.firstOrNull()) {
@@ -359,7 +357,8 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
             )
             in owoCommands -> {
             }
-            else -> countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
+            /* else -> countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild) */
+
         }
     }
 
