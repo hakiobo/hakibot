@@ -287,23 +287,22 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
             handleCommand(mCE, mCE.message.content.drop(pre.length).trim())
         }
         val owoPre = guild.owoPrefix
+        val maybeCountOwO = mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)
         if (mCE.message.content.startsWith(GLOBAL_OWO_PREFIX, ignoreCase = true)) {
             handleOWOCommand(
                 mCE,
                 guild,
                 mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(),
-                true,
-//                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+                maybeCountOwO,
             )
         } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
             handleOWOCommand(
                 mCE,
                 guild,
                 mCE.message.content.drop(owoPre.length).trim(),
-                false,
-//                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
+                maybeCountOwO,
             )
-        } else if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
+        } else if (maybeCountOwO) {
             countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
@@ -353,7 +352,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         mCE: MessageCreateEvent,
         guild: HakiGuild,
         msg: String,
-        globalPrefix: Boolean
+        countOwOOnFail: Boolean
     ) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.firstOrNull()) {
@@ -368,7 +367,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
             )
             in owoCommands -> {
             }
-            else -> if (globalPrefix) countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
+            else -> if (countOwOOnFail) countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
     }
 
