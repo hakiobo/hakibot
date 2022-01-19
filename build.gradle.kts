@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.huebnerj"
-version = "1.0-SNAPSHOT"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ repositories {
 }
 dependencies {
     testImplementation(kotlin("test-testng"))
-    implementation("dev.kord", "kord-core", "0.7.0-SNAPSHOT")
+    implementation("dev.kord", "kord-core", "0.7.0-RC2")
     implementation("org.slf4j", "slf4j-simple", "1.7.30")
     implementation("org.litote.kmongo", "kmongo-coroutine", "4.2.4")
 }

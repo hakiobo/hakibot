@@ -10,6 +10,7 @@ import commands.hidden.SearchForCPCommand
 import commands.meta.*
 import commands.utils.BotCommand
 import commands.utils.CommandCategory
+import dev.kord.common.annotation.KordPreview
 import dev.kord.common.entity.DiscordMessage
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
@@ -99,6 +100,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         Patreon,
     )
 
+    @KordPreview
     suspend fun startUp() {
         client.on<ReadyEvent> {
             messageChannelById(ONLINE_CHANNEL, "Online! (${this.shard})")
@@ -166,7 +168,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
             }
         }
         client.login {
-            since = Instant.now().minusSeconds(60 * 60 * 8)!!
+            since = Instant.now().minusSeconds(60 * 60 * 8L)!!
             playing("h!help")
         }
     }
@@ -199,6 +201,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         }
     }
 
+    @KordPreview
     private suspend fun handleMessage(mCE: MessageCreateEvent) {
         if (mCE.message.author?.id == client.selfId) return
         if (mCE.message.author == null) return
@@ -244,11 +247,12 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                     val id = desc.split("\n**ID:** ").last().split("`")[1]
                     val weaps = db.getCollection<Weapon>("weapons")
                     if (weaps.findOne(Weapon::_id eq id) == null) {
-                        messageChannelById(FABLED_WEAP_CHANNEL, "", EmbedBuilder().apply {
+                        val msg = messageChannelById(FABLED_WEAP_CHANNEL, "", EmbedBuilder().apply {
                             title = "Fabled ${info.second} Found"
                             description = "ID: $id"
                         })
                         weaps.insertOne(Weapon(id, info.second))
+                        client.rest.channel.crossPost(msg.channelId, msg.id)
                     }
                 }
             }
@@ -288,6 +292,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 mCE,
                 guild,
                 mCE.message.content.drop(GLOBAL_OWO_PREFIX.length).trim(),
+                true,
 //                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
             )
         } else if (mCE.message.content.startsWith(owoPre, ignoreCase = true)) {
@@ -295,12 +300,11 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 mCE,
                 guild,
                 mCE.message.content.drop(owoPre.length).trim(),
+                false,
 //                getUserFromDB(mCE.message.author!!.id, mCE.message.author)
             )
-        } else {
-            if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
-                countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
-            }
+        } else if (mCE.message.content.contains("owo", true) || mCE.message.content.contains("uwu", true)) {
+            countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
             if (!guild.settings.allowGlobalPrefix) {
@@ -345,7 +349,12 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         return null
     }
 
-    private suspend fun handleOWOCommand(mCE: MessageCreateEvent, guild: HakiGuild, msg: String) {
+    private suspend fun handleOWOCommand(
+        mCE: MessageCreateEvent,
+        guild: HakiGuild,
+        msg: String,
+        globalPrefix: Boolean
+    ) {
         val split = msg.split(Pattern.compile("\\s"))
         when (split.firstOrNull()) {
             "hunt", "h", "catch" -> if (huntReminders) owoHuntOWOCMD(
@@ -359,7 +368,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
             )
             in owoCommands -> {
             }
-            else -> countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
+            else -> if (globalPrefix) countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
     }
 
@@ -533,6 +542,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         }
     }
 
+    @KordPreview
     private suspend fun handleOWODexEntry(mCE: MessageCreateEvent, embed: Embed) {
         val new = parseCP(mCE.message, embed)
         val name = new.name
@@ -540,10 +550,11 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         when (val search = col.findOne(CustomPatreon::name eq name)) {
             null -> {
                 col.insertOne(new)
-                messageChannelById(CP_ADD_CHANNEL, "added from ${mCE.message.getGuild().name}", new.toEmbed())
+                val msg = messageChannelById(CP_ADD_CHANNEL, "added from ${mCE.message.getGuild().name}", new.toEmbed())
 //                dmUser(HAKIOBO_ID, ")
                 mCE.message.addReaction(ReactionEmoji.Unicode("\u2705"))
                 sendMessage(mCE.message.channel, "added\n$new", 10_000)
+                client.rest.channel.crossPost(msg.channelId, msg.id)
             }
             new -> mCE.message.addReaction(ReactionEmoji.Unicode("\ud83d\udd01"))
             else -> {

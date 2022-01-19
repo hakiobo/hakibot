@@ -260,8 +260,8 @@ fun scythe(desc: String): List<ReactionEmoji> {
     val pcts = getBestPct(statSum, 4)
     val reactions = mutableListOf(r1, pcts.first)
     if (pcts.first != pcts.second) reactions += pcts.second
-    val r2 = judgeWeapon(cost + (mort - 300) / 3 + 100, 3)
-    if (r1 != r2) reactions += r2
+//    val r2 = judgeWeapon(cost + (mort - 300) / 3 + 100, 3)
+//    if (r1 != r2) reactions += r2
     return reactions
 }
 

@@ -16,7 +16,7 @@ suspend fun main() {
     val discordClient = Kord(System.getenv("hakibot-token")) {
         this.sharding { recommended ->
             println(recommended)
-            Shards(1)
+            Shards(2)
         }
     }
     val mongoSettings =
