@@ -13,11 +13,11 @@ val MONGO_CONNECT_URI =
 
 
 suspend fun main() {
-    val discordClient = Kord(System.getenv("hakibot-token")) {
-        this.sharding { recommended ->
-            println(recommended)
-            Shards(2)
-        }
+    val discordClient = Kord(System.getenv("hikabot-token")) {
+//        this.sharding { recommended ->
+//            println(recommended)
+//            Shards(2)
+//        }
     }
     val mongoSettings =
         MongoClientSettings.builder().applyConnectionString(MONGO_CONNECT_URI).writeConcern(WriteConcern.MAJORITY)

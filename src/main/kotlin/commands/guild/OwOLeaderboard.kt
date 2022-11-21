@@ -53,7 +53,7 @@ object OwOLeaderboard : BotCommand {
                         sizeSet = true
                         size = arg.toInt()
                     }
-                } else if (mCE.guildId?.value == Hakibot.LXV_SERVER && arg.startsWith("p") && arg.drop(1).toIntOrNull() != null) {
+                } else if (arg.startsWith("p") && arg.drop(1).toIntOrNull() != null) {
                     if (pageSet) {
                         valid = false
                     } else {
@@ -266,9 +266,7 @@ object OwOLeaderboard : BotCommand {
                     match(UserGuildOwOCount::lastOWO gte unit.startOfCurrentPeriod(mCE.message.id).toEpochMilli()),
                     sort(descending(unit.curStat)),
                     limit(pageSize * pages),
-                    sort(ascending(unit.curStat)),
-                    limit(pageSize),
-                    sort(descending(unit.curStat)),
+                    skip(pageSize * (pages - 1)),
                 ).toList().map { Pair(it.user, unit.curStat.get(it)) }
             }
         },

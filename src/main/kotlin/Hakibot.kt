@@ -1,4 +1,3 @@
-import entities.UserGuildOwOCount.Companion.countOwO
 import commands.*
 import commands.guild.*
 import commands.guild.DeleteOwOCount.cancelDeletion
@@ -53,24 +52,24 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
     @Volatile
     internal var triggersActive = true
 
-    @Volatile
-    internal var abnormalThreshold = 10
+//    @Volatile
+//    internal var abnormalThreshold = 10
 
     private val triggers = mapOf(
-        "haki" to "is coding god",
-        "hika" to "god is coding",
-        "anvi" to "sewen sewenty",
-        "asono" to "waifu's inva", "asona" to "waifu's inva", "asano" to "waifu's inva",
-        "nea" to "js in codes",
-        "yez" to "doesn't code enough",
-        "furo" to "Furory?",
-        "shufi" to "your bow lol god down",
+//        "haki" to "is coding god",
+//        "hika" to "god is coding",
+//        "anvi" to "sewen sewenty",
+//        "asono" to "waifu's inva", "asona" to "waifu's inva", "asano" to "waifu's inva",
+//        "nea" to "js in codes",
+//        "yez" to "doesn't code enough",
+//        "furo" to "Furory?",
+//        "shufi" to "your bow lol god down",
         "sellchart" to "5 - B\n2.5 - F\n2 - P CP H\n1.67 - M\n1.5 - L G D\n1.2 - S\n1 - C E\n0.6 - U\n0.5 - R",
-        "licu" to "Should curse haki"
+//        "licu" to "Should curse haki"
     )
     val commands = listOf(
         HelpCommand,
-        ReportCommand,
+//        ReportCommand,
         DMCommand,
         PrefixCommand,
         OWOPrefixCommand,
@@ -78,32 +77,32 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
         OWOPraySettingsCommand,
         CPCommand,
         WhoIsCommand,
-        SuggestCommand,
+//        SuggestCommand,
         SearchForCPCommand,
-        InviteCommand,
+//        InviteCommand,
         GuildsCommand,
-        ServerCommand,
+//        ServerCommand,
         LogoutCommand,
         TriggerCommand,
         WhenCommand,
         UseGlobalPrefixCommand,
-        OwOStat,
-        OwOLeaderboard,
+//        OwOStat,
+//        OwOLeaderboard,
         MathCommand,
         Ping,
         GithubCommand,
         GlobalDisableCommand,
         ViewGlobalSettings,
         GuildStatus,
-        DisableCounting,
-        DeleteOwOCount,
-        Patreon,
+//        DisableCounting,
+//        DeleteOwOCount,
+//        Patreon,
     )
 
     @KordPreview
     suspend fun startUp() {
         client.on<ReadyEvent> {
-            messageChannelById(ONLINE_CHANNEL, "Online! (${this.shard})")
+            messageChannelById(ONLINE_CHANNEL, "Online (as Hakibot, but only for LXV)! (${this.shard})")
         }
         client.on<ReactionAddEvent> {
             if (userId.value == OWO_ID && emoji == ReactionEmoji.Unicode("\u27a1\ufe0f") && (guildId?.value == HAKIBOT_SERVER || channelId.value in HAKI_SHOP_REACT_CHANNELS)) {
@@ -115,24 +114,24 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 }
             } else if (userId.value == HAKIOBO_ID && emoji == SuggestCommand.TRASH && getMessage().author?.id == client.selfId) {
                 message.delete()
-            } else if (emoji in listOf(
-                    ReactionEmoji.Unicode(CHECKMARK_EMOJI),
-                    ReactionEmoji.Unicode(CROSSMARK_EMOJI)
-                ) && (this.userAsMember?.asMember()?.isOwner() == true || userId.value == HAKIOBO_ID)
-            ) {
-                val msg = getMessage()
-                if (msg.author?.id?.value == client.selfId.value) {
-                    val embed = msg.embeds.firstOrNull()
-                    if (embed?.author?.name == userId.asString && getUserIdFromString(embed.footer!!.text) != null
-                        && embed.color?.rgb == 0x0000FF
-                    ) {
-                        if (emoji == ReactionEmoji.Unicode(CHECKMARK_EMOJI)) {
-                            confirmDeletion(msg, guildId!!)
-                        } else {
-                            cancelDeletion(msg)
-                        }
-                    }
-                }
+//            } else if (emoji in listOf(
+//                    ReactionEmoji.Unicode(CHECKMARK_EMOJI),
+//                    ReactionEmoji.Unicode(CROSSMARK_EMOJI)
+//                ) && (this.userAsMember?.asMember()?.isOwner() == true || userId.value == HAKIOBO_ID)
+//            ) {
+//                val msg = getMessage()
+//                if (msg.author?.id?.value == client.selfId.value) {
+//                    val embed = msg.embeds.firstOrNull()
+//                    if (embed?.author?.name == userId.asString && getUserIdFromString(embed.footer!!.text) != null
+//                        && embed.color?.rgb == 0x0000FF
+//                    ) {
+//                        if (emoji == ReactionEmoji.Unicode(CHECKMARK_EMOJI)) {
+//                            confirmDeletion(msg, guildId!!)
+//                        } else {
+//                            cancelDeletion(msg)
+//                        }
+//                    }
+//                }
             }
         }
         client.on<MessageCreateEvent> {
@@ -303,7 +302,7 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 maybeCountOwO,
             )
         } else if (maybeCountOwO) {
-            countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
+//            countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
         if (mCE.message.mentionedUserIds.contains(client.selfId)) {
             if (!guild.settings.allowGlobalPrefix) {
@@ -365,9 +364,9 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
                 split.first(),
                 getUserFromDB(mCE.message.author!!.id, mCE.message.author)
             )
-            in owoCommands -> {
-            }
-            else -> if (countOwOOnFail) countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
+//            in owoCommands -> {
+//            }
+//            else -> if (countOwOOnFail) countOwO(mCE, getUserFromDB(mCE.message.author!!.id, mCE.message.author), guild)
         }
     }
 
@@ -607,14 +606,16 @@ class Hakibot(val client: Kord, val db: CoroutineDatabase) {
     }
 
     companion object {
-        const val BOT_NAME = "HakiBot"
+        const val BOT_NAME = "HikaBot"
         const val HAKIBOT_SERVER = 758479736564875265
         const val LXV_SERVER = 714152739252338749
         private const val LXV_ALERT_CHANNEL = 714178162757599344
         private const val HNS_ANNOUNCEMENT_CHANNEL = 572201299937067019
         private const val BXW_SHOP_CHANNEL = 766068414212210738
         val HAKI_SHOP_REACT_CHANNELS = listOf(HNS_ANNOUNCEMENT_CHANNEL, LXV_ALERT_CHANNEL, BXW_SHOP_CHANNEL)
-        const val ONLINE_CHANNEL = 761020851029803078
+
+        //        const val ONLINE_CHANNEL = 761020851029803078
+        const val ONLINE_CHANNEL = 816768818088116225
         const val CP_ADD_CHANNEL = 766050133430239243
         const val CP_UPD_CHANNEL = 766050160949330001
         const val CP_FAIL_CHANNEL = 809676379020722186
